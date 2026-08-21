@@ -113,6 +113,9 @@
                 <button onclick="handleStartTest()" class="text-slate-400 hover:text-white text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
                     <span>📝</span> بدء الاختبار
                 </button>
+                <button id="resultNavLink" onclick="handleShowResult()" class="text-slate-400 hover:text-white text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+                    <span>📊</span> نتيجة الاختبار
+                </button>
                 <a id="adminNavLink" href="admin.html" class="hidden text-amber-400 hover:text-amber-300 text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-amber-500/40 flex items-center gap-1.5">
                     <span>⚙️</span> لوحة التحكم
                 </a>
@@ -128,7 +131,6 @@
 
                 <div class="flex items-center gap-3 border-r border-slate-800 pr-4">
                     <div class="w-11 h-11 rounded-full border-2 border-slate-700 bg-slate-900 flex items-center justify-center overflow-hidden shadow-md">
-                        <!-- الشعار الصغير في الهيدر -->
                         <img src="https://cdn.discordapp.com/attachments/1538837684687208569/1539919119225323570/image.png?ex=6a8810f0&is=6a86bf70&hm=dd495478523ed60a6e1b5d5af1584fa9258c1721528ee0643ece371db856e733" alt="LSPD Logo" class="w-full h-full object-cover">
                     </div>
                     <div class="text-left">
@@ -143,9 +145,9 @@
 
     <main class="max-w-7xl mx-auto px-6 py-12 flex-grow grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
         <div class="lg:col-span-3 space-y-12">
+            <!-- الواجهة الرئيسية -->
             <div class="bg-[#0c1019] border-2 border-slate-800/80 p-10 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-8">
                 <div class="w-36 h-36 md:w-48 md:h-48 shrink-0 rounded-full border-4 border-amber-400/20 bg-slate-900 p-2 shadow-2xl shadow-amber-500/10 overflow-hidden">
-                    <!-- الشعار الكبير في الواجهة -->
                     <img src="https://cdn.discordapp.com/attachments/1538837684687208569/1539919119225323570/image.png?ex=6a8810f0&is=6a86bf70&hm=dd495478523ed60a6e1b5d5af1584fa9258c1721528ee0643ece371db856e733" alt="LSPD Logo" class="w-full h-full object-cover rounded-full">
                 </div>
                 
@@ -164,6 +166,46 @@
                             <span>بدء الاختبار الآن</span>
                             <span>←</span>
                         </button>
+                        <button onclick="handleShowResult()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition border border-slate-700 flex items-center gap-2">
+                            <span>عرض نتيجتي 📊</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- قسم عرض نتيجة الاختبار مباشرة بالرئيسية -->
+            <div id="resultSection" class="hidden bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <h2 class="text-2xl font-black text-amber-400 flex items-center gap-2">
+                        <span>📊</span> نتيجة الاختبار الخاص بك
+                    </h2>
+                    <button onclick="hideResultSection()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-300">إغلاق ✕</button>
+                </div>
+
+                <!-- حالة الانتظار / قيد التصحيح -->
+                <div id="resultPendingView" class="hidden text-center py-8 space-y-3">
+                    <div class="text-amber-400 text-4xl">⏳</div>
+                    <h3 class="text-lg font-bold text-white">النتيجة قيد التصحيح والتقييم</h3>
+                    <p class="text-slate-400 text-xs max-w-md mx-auto">تم استلام إجاباتك بنجاح، وتعمل لجنة المشرفين حالياً على تقييمها. يرجى إعادة التحقق لاحقاً.</p>
+                </div>
+
+                <!-- حالة النتيجة المكتملة -->
+                <div id="resultDetailsView" class="hidden space-y-6 text-center">
+                    <div id="resBadge" class="inline-block px-4 py-1.5 rounded-full text-xs font-bold border"></div>
+
+                    <div>
+                        <h3 class="text-xl font-black text-white" id="resStudentName">--</h3>
+                        <p class="text-slate-400 text-xs mt-1" id="resExamInfo">--</p>
+                    </div>
+
+                    <div class="bg-[#141a27] border border-slate-800 p-6 rounded-2xl max-w-sm mx-auto space-y-1">
+                        <span class="text-xs text-slate-400 font-bold">النسبة المئوية:</span>
+                        <div class="text-5xl font-black" id="resScore">0%</div>
+                    </div>
+
+                    <div class="bg-[#141a27] border border-slate-800 p-4 rounded-xl text-right text-xs space-y-2 max-w-xl mx-auto">
+                        <p class="text-slate-300"><strong>القرار النهائي:</strong> <span id="resDecision" class="text-white">--</span></p>
+                        <p class="text-slate-300"><strong>ملاحظات لجنة المشرفين:</strong> <span id="resNotes" class="text-slate-400">--</span></p>
                     </div>
                 </div>
             </div>
@@ -190,7 +232,7 @@
             </div>
             <div>
                 <h3 class="text-xl font-black text-white mb-2">تسجيل الدخول مطلوب</h3>
-                <p class="text-xs text-slate-400 leading-relaxed">عذراً، يجب عليك تسجيل الدخول أولاً بحساب مختبر معتمد أو مشرف لتتمكن من خوض الاختبار القيادي.</p>
+                <p class="text-xs text-slate-400 leading-relaxed">عذراً، يجب عليك تسجيل الدخول أولاً بحساب مختبر معتمد أو مشرف لتتمكن من خوض الاختبار القيادي أو رؤية النتيجة.</p>
             </div>
             <div class="flex gap-3 pt-3">
                 <button onclick="closeRequireModal(); openDiscordModal();" class="flex-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs py-3 rounded-xl transition shadow-lg">
@@ -361,6 +403,73 @@
             }
         }
 
+        // ===== دوال استعلام وعرض النتيجة =====
+        function handleShowResult() {
+            let student = localStorage.getItem('studentUser');
+            let isAdmin = localStorage.getItem('isAdminLoggedIn');
+
+            if (!student && isAdmin !== 'true') {
+                openRequireModal();
+                return;
+            }
+
+            const resultSection = document.getElementById('resultSection');
+            const resultPendingView = document.getElementById('resultPendingView');
+            const resultDetailsView = document.getElementById('resultDetailsView');
+
+            resultSection.classList.remove('hidden');
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+
+            // البحث عن الإجابة والنتيجة من Firebase
+            db.ref('lspd_submissions').once('value').then(snapshot => {
+                const submissions = snapshot.val() || {};
+                
+                const userSubKey = Object.keys(submissions).reverse().find(key => 
+                    submissions[key] && submissions[key].accountUsername === student
+                );
+
+                if (!userSubKey) {
+                    resultPendingView.classList.remove('hidden');
+                    resultDetailsView.classList.add('hidden');
+                    return;
+                }
+
+                const subData = submissions[userSubKey];
+
+                if (subData.score === undefined && !subData.status) {
+                    resultPendingView.classList.remove('hidden');
+                    resultDetailsView.classList.add('hidden');
+                    return;
+                }
+
+                resultPendingView.classList.add('hidden');
+                resultDetailsView.classList.remove('hidden');
+
+                document.getElementById('resStudentName').innerText = subData.fullName || 'المختبر';
+                document.getElementById('resExamInfo').innerText = `الرتبة: ${subData.targetRank || '-'} | الاختبار: ${subData.certificateType || '-'}`;
+                document.getElementById('resScore').innerText = (subData.score || 0) + '%';
+                document.getElementById('resDecision').innerText = subData.status || 'تم التقييم';
+                document.getElementById('resNotes').innerText = subData.notes || 'لا يوجد ملاحظات إضافية.';
+
+                const badge = document.getElementById('resBadge');
+                const scoreDisplay = document.getElementById('resScore');
+
+                if (subData.status === 'مقبول' || (subData.score >= (subData.passScore || 70))) {
+                    badge.innerText = 'PASSED - ناجح';
+                    badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400';
+                    scoreDisplay.className = 'text-5xl font-black text-emerald-400';
+                } else {
+                    badge.innerText = 'FAILED - لم يتجاوز الاختبار';
+                    badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-red-500/40 bg-red-500/10 text-red-400';
+                    scoreDisplay.className = 'text-5xl font-black text-red-400';
+                }
+            });
+        }
+
+        function hideResultSection() {
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
         function openRequireModal() {
             document.getElementById('requireLoginModal').classList.remove('hidden');
         }
@@ -402,8 +511,9 @@
                     } else {
                         localStorage.setItem('studentUser', user);
                         localStorage.setItem('studentName', data.name);
-                        alert("مرحباً بك " + data.name + "، يمكنك الآن التوجه للاختبار.");
-                        window.location.href = "tests.html";
+                        alert("مرحباً بك " + data.name + "، تم تسجيل الدخول بنجاح.");
+                        closeDiscordModal();
+                        updateUI();
                     }
                 } else {
                     alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
@@ -418,6 +528,7 @@
             localStorage.removeItem('adminRoles');
             localStorage.removeItem('studentUser');
             localStorage.removeItem('studentName');
+            hideResultSection();
             updateUI();
             alert("تم تسجيل الخروج.");
         }
