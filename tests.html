@@ -34,7 +34,7 @@
         <div id="blockedView" class="hidden bg-[#0c1019] border-2 border-red-500/30 p-8 rounded-3xl shadow-2xl w-full max-w-2xl text-center space-y-4">
             <div class="text-red-400 text-4xl">🛑</div>
             <h1 class="text-xl font-black text-white">لديك طلب اختبار سابق قيد المراجعة</h1>
-            <p class="text-slate-400 text-sm" id="blockReasonText">تم اكتشاف طلب مرتبط بحسابك لا يزال قيد التقييم. لا يمكنك إجراء اختبار جديد حتى يتم البت فيه.</p>
+            <p class="text-slate-400 text-sm" id="blockReasonText">تم اكتشاف طلب مرتبط بحسابك لا يزال قيد التقييم. لا يمكنك إجراء اختبار جديد حتى يتم البت فيه من قبل إدارة الأكاديمية.</p>
             <button onclick="window.location.reload()" class="inline-block bg-slate-800 hover:bg-slate-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition mt-4">تحديث الصفحة</button>
         </div>
 
@@ -69,8 +69,9 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الرتبة المستهدفة (محددة بحسابك):</label>
-                    <select id="targetRank" disabled class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500 opacity-80 cursor-not-allowed">
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الرتبة المستهدفة (مقيدة):</label>
+                    <select id="targetRank" disabled class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed focus:outline-none">
+                        <option value="">جاري قراءة البيانات...</option>
                         <option value="Officer 1">Officer 1</option>
                         <option value="Officer 2">Officer 2</option>
                         <option value="Officer 3">Officer 3</option>
@@ -82,8 +83,9 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الشهادة المقدم عليها (محددة بحسابك):</label>
-                    <select id="certificateType" disabled class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-amber-400 font-bold focus:outline-none focus:border-blue-500 opacity-80 cursor-not-allowed">
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الشهادة المقدم عليها (مقيدة):</label>
+                    <select id="certificateType" disabled class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-amber-400 font-bold cursor-not-allowed focus:outline-none">
+                        <option value="">جاري قراءة البيانات...</option>
                         <option value="Certified Lead">Certified Lead</option>
                         <option value="Watch Commander">Watch Commander</option>
                         <option value="Supervisor">Supervisor</option>
@@ -142,7 +144,7 @@
             <div class="question-box-bg border border-slate-800/80 rounded-xl p-8 relative">
                 <div class="flex justify-between items-center mb-8">
                     <div class="border border-slate-700 bg-[#0b1120] text-red-400 text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-2">
-                        ⏱ <span id="timerDisplay">01:00</span>
+                        ⏱ <span id="timerDisplay">00:00</span>
                     </div>
                     <div class="text-blue-500 text-xs font-bold tracking-widest uppercase" id="questionNumberText">
                         QUESTION 01
@@ -309,13 +311,19 @@
                 return;
             }
 
-            // تحميل بيانات الحساب وتقييد الرتبة والشهادة
+            // جلب وتقييد بيانات الرتبة والشهادة المخصصة للمختبر فور تسجيل الدخول
             db.ref('lspd_users/' + studentAccountUser).once('value').then(snapshot => {
-                let user = snapshot.val();
-                if (user) {
-                    if (user.name) document.getElementById('fullName').value = user.name;
-                    if (user.targetRank) document.getElementById('targetRank').value = user.targetRank;
-                    if (user.certificateType) document.getElementById('certificateType').value = user.certificateType;
+                let userData = snapshot.val();
+                if (userData) {
+                    if (userData.allowedRank) {
+                        document.getElementById('targetRank').value = userData.allowedRank;
+                    }
+                    if (userData.allowedCert) {
+                        document.getElementById('certificateType').value = userData.allowedCert;
+                    }
+                    if (userData.name) {
+                        document.getElementById('fullName').value = userData.name;
+                    }
                 }
                 document.getElementById('step1').classList.remove('hidden');
             });
@@ -351,18 +359,17 @@
             let targetRank = document.getElementById('targetRank').value;
             let certificateType = document.getElementById('certificateType').value;
 
-            if (!fullName || !callSign || !discordUser || !certificateType) {
-                return alert("الرجاء تعبئة جميع البيانات!");
+            if (!fullName || !callSign || !discordUser || !targetRank || !certificateType) {
+                return alert("الرجاء تعبئة جميع البيانات المطلوبة!");
             }
 
             db.ref('lspd_submissions').once('value').then(snapshot => {
                 let submissions = snapshot.val() || {};
                 
-                // السماح بإعادة الاختبار لمن حصل على "فرصة ثانية" أو رفض/قبول
-                // ولا يمنع الاختبار إلا إذا كانت الحالة قيد التقييم/المراجعة (غير مجاب عليها)
+                // السماح لمن لديه قرار سابق ("فرصة ثانية", "مقبول", "مرفوض") بخوض اختبار جديد.
+                // يتم حظر المختبر فقط إذا كان لديه طلب قيد المراجعة (!s.status)
                 let activeSub = Object.values(submissions).find(s => 
-                    s && s.accountUsername === studentAccountUser && 
-                    (!s.status || s.status === 'قيد المراجعة')
+                    s && s.accountUsername === studentAccountUser && !s.status
                 );
 
                 if (activeSub) {
@@ -378,8 +385,9 @@
                     }
 
                     let timerMinutes = savedData.timer || savedData.timerMinutes || 5;
-                    // حساب زمن السؤال بدقة بدون حد أدنى 15 ثانية لتغطية الأوقات السريعة (تحت 30 ثانية)
-                    secondsPerQuestion = Math.max(5, Math.floor((timerMinutes * 60) / savedData.questions.length));
+                    
+                    // حساب زمن السؤال بالثواني بناءً على مجموع الوقت المدخل مقسوماً على عدد الأسئلة بدون حد أدنى 15 ثانية
+                    secondsPerQuestion = Math.floor((timerMinutes * 60) / savedData.questions.length);
 
                     currentExamData = { fullName, callSign, discordUser, targetRank, certificateType, questionsList: savedData.questions };
                     userAnswers = new Array(savedData.questions.length).fill(null);
@@ -675,7 +683,6 @@
                 certificateType: currentExamData.certificateType,
                 theoryAnswersHTML: currentExamData.theoryAnswersHTML,
                 mdtReportHTML: mdtReportHTML,
-                status: "قيد المراجعة",
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
