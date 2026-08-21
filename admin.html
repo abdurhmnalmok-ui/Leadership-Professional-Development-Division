@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم والسيطرة - أكاديمية شرطة لوس سانتوس</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-[#080B12] text-slate-200 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <header class="border-b border-slate-800/50 bg-[#0a0e16] sticky top-0 z-50">
+        <div class="max-w-[96rem] mx-auto px-6 py-2.5 flex items-center justify-between">
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <a href="index.html" class="text-slate-400 hover:text-white text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5"><span>🏠</span> الرئيسية</a>
+                <a href="tests.html" class="text-slate-400 hover:text-white text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5"><span>📝</span> الاختبار</a>
+                <a href="admin.html" class="text-amber-400 text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5"><span>⚙️</span> لوحة التحكم</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="adminWelcomeName" class="text-xs text-amber-400 font-bold bg-amber-400/10 border border-amber-400/20 px-3 py-1 rounded-lg"></span>
+                <div class="text-white font-black text-sm">LSPD ADMIN</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-start p-6 relative w-full max-w-7xl mx-auto">
+        <div id="errorView" class="hidden text-center bg-[#0c1019] border-2 border-red-500/30 p-10 rounded-3xl shadow-2xl max-w-lg w-full my-auto">
+            <div class="text-red-500 text-5xl mb-4">🔒</div>
+            <h1 class="text-2xl font-black text-white mb-2">تسجيل الدخول مطلوب</h1>
+            <p class="text-slate-400 text-xs mb-6">عذراً، يجب عليك تسجيل الدخول بحساب مشرف معتمد للوصول للوحة التحكم.</p>
+            <a href="index.html" class="inline-block bg-amber-400 hover:bg-amber-500 text-slate-950 font-black px-6 py-2.5 rounded-xl text-sm transition">الذهاب لتسجيل الدخول 🔑</a>
+        </div>
+
+        <div id="adminView" class="hidden w-full space-y-8 py-6">
+            <div class="bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl shadow-xl flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-black text-amber-400">لوحة التحكم والتصحيح</h1>
+                    <p class="text-slate-400 text-sm mt-1">تقييم المختبرين، كتابة النسبة يدوياً، إدارة الأسئلة والحسابات.</p>
+                </div>
+                <button onclick="logoutAdmin()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">تسجيل خروج</button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <button onclick="switchTab('results')" id="tabBtn-results" class="tab-btn bg-amber-400 text-slate-950 font-black p-4 rounded-2xl text-sm transition flex items-center justify-center gap-2"><span>📊</span> تقييم النتائج</button>
+                <button onclick="switchTab('questions')" id="tabBtn-questions" class="tab-btn bg-[#0c1019] border-2 border-slate-800 text-slate-300 font-bold p-4 rounded-2xl text-sm transition flex items-center justify-center gap-2"><span>📋</span> إدارة الأسئلة</button>
+                <button onclick="switchTab('decisions')" id="tabBtn-decisions" class="tab-btn bg-[#0c1019] border-2 border-slate-800 text-slate-300 font-bold p-4 rounded-2xl text-sm transition flex items-center justify-center gap-2"><span>⚖️</span> القبول والرفض</button>
+                <button onclick="switchTab('database')" id="tabBtn-database" class="tab-btn bg-[#0c1019] border-2 border-slate-800 text-slate-300 font-bold p-4 rounded-2xl text-sm transition flex items-center justify-center gap-2"><span>🗂️</span> بيانات المختبرين</button>
+                <button onclick="switchTab('users')" id="tabBtn-users" class="tab-btn bg-[#0c1019] border-2 border-slate-800 text-slate-300 font-bold p-4 rounded-2xl text-sm transition flex items-center justify-center gap-2"><span>👤</span> إدارة الحسابات</button>
+            </div>
+
+            <div id="tab-results" class="tab-content space-y-6">
+                <div class="bg-[#0c1019] border-2 border-slate-800 p-6 rounded-3xl shadow-xl">
+                    <h2 class="text-xl font-black text-amber-400 mb-4">📊 فحص الإجابات والتقارير وتقييم النسبة</h2>
+                    <div id="resultsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <div id="tab-questions" class="tab-content hidden space-y-6">
+                <div class="bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl shadow-xl space-y-6">
+                    <div class="border-b border-slate-800 pb-4">
+                        <h2 class="text-lg font-black text-amber-400">إدارة وتعديل أسئلة الرتب ووقت الاختبار ونسبة النجاح</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2">اختر الرتبة:</label>
+                            <select id="questionRankSelect" onchange="loadRankQuestions()" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none focus:border-amber-400">
+                                <option value="Officer 1">Officer 1</option>
+                                <option value="Officer 2">Officer 2</option>
+                                <option value="Officer 3">Officer 3</option>
+                                <option value="Senior Officer">Senior Officer</option>
+                                <option value="Sergeant">Sergeant</option>
+                                <option value="First Sergeant">First Sergeant</option>
+                                <option value="Staff Sergeant">Staff Sergeant</option>
+                                <option value="Lieutenant">Lieutenant</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2">الشهادة المقدم عليها:</label>
+                            <select id="questionCertSelect" onchange="loadRankQuestions()" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none focus:border-amber-400">
+                                <option value="">اختر الشهادة...</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2">عدد الأسئلة:</label>
+                            <input type="number" id="questionCountInput" min="1" max="15" value="3" onchange="generateQuestionInputs()" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none focus:border-amber-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2">وقت الاختبار (بالدقائق):</label>
+                            <input type="number" id="timerMinutesInput" min="1" max="120" value="5" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none focus:border-amber-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 mb-2">نسبة النجاح (%):</label>
+                            <input type="number" id="passScoreInput" min="1" max="100" value="70" placeholder="70" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none focus:border-amber-400">
+                        </div>
+                    </div>
+
+                    <div id="questionsContainer" class="space-y-4 pt-4 border-t border-slate-800"></div>
+                    <button onclick="saveRankQuestions()" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-black py-3.5 rounded-xl transition text-sm shadow-lg">حفظ الأسئلة ووقت الاختبار ونسبة النجاح 💾</button>
+                </div>
+            </div>
+
+            <div id="tab-decisions" class="tab-content hidden space-y-6">
+                <div class="bg-[#0c1019] border-2 border-slate-800 p-6 rounded-3xl shadow-xl">
+                    <h2 class="text-xl font-black text-amber-400 mb-4">⚖️ إدارة طلبات القبول والرفض والفرصة الثانية</h2>
+                    <div id="decisionsList" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <div id="tab-database" class="tab-content hidden space-y-6">
+                <div class="bg-[#0c1019] border-2 border-slate-800 p-6 rounded-3xl shadow-xl">
+                    <h2 class="text-xl font-black text-amber-400 mb-4">🗂️ السجل الشامل لبيانات المختبرين</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs text-slate-300">
+                            <thead class="bg-[#141a27] text-slate-400 border-b border-slate-800">
+                                <tr>
+                                    <th class="p-3.5 rounded-r-xl">اسم المتقدم</th>
+                                    <th class="p-3.5">الرتبة</th>
+                                    <th class="p-3.5">اليوونت</th>
+                                    <th class="p-3.5">النسبة</th>
+                                    <th class="p-3.5">التأهيل</th>
+                                    <th class="p-3.5">القرار النهائي</th>
+                                    <th class="p-3.5 rounded-l-xl text-center">إجراء (X)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60" id="databaseTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-users" class="tab-content hidden space-y-6">
+                <div class="bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl shadow-xl space-y-6">
+                    <h2 class="text-xl font-black text-amber-400">👤 إدارة حسابات المشرفين والمختبرين</h2>
+                    
+                    <div class="bg-[#141a27] border border-slate-800 p-6 rounded-2xl space-y-4">
+                        <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-2">➕ إنشاء حساب جديد</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">نوع الحساب:</label>
+                                <select id="newUserRole" onchange="togglePermissionsView()" class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white">
+                                    <option value="student">🎓 مختبر</option>
+                                    <option value="supervisor">🛡️ مشرف</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">الاسم الكامل / اليونت:</label>
+                                <input type="text" id="newAdminName" placeholder="مثال: John Doe (C-12)" class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">اسم المستخدم (Username):</label>
+                                <input type="text" id="newAdminUser" placeholder="مثال: john12" class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">كلمة المرور (Password):</label>
+                                <input type="password" id="newAdminPass" placeholder="••••••••" class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white">
+                            </div>
+                        </div>
+
+                        <div id="studentPermissionsBox" class="bg-[#0c1019] border border-slate-700/60 p-4 rounded-xl space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-amber-400 mb-1">🎯 اختر الرتبة المسموح بها:</label>
+                                    <select id="newRankSelect" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-amber-400">
+                                        <option value="">-- بدون تحديد رتبة --</option>
+                                        <option value="Officer 1">Officer 1</option>
+                                        <option value="Officer 2">Officer 2</option>
+                                        <option value="Officer 3">Officer 3</option>
+                                        <option value="Senior Officer">Senior Officer</option>
+                                        <option value="Sergeant">Sergeant</option>
+                                        <option value="First Sergeant">First Sergeant</option>
+                                        <option value="Staff Sergeant">Staff Sergeant</option>
+                                        <option value="Lieutenant">Lieutenant</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-amber-400 mb-1">🏅 الشهادة المسموح بها:</label>
+                                    <select id="newCertSelect" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:border-amber-400">
+                                        <option value="">اختر الشهادة...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="supervisorRoleBox" class="bg-[#0c1019] border border-slate-700/60 p-4 rounded-xl space-y-3 hidden">
+                            <label class="block text-xs font-bold text-amber-400 mb-1">🛡️ اختر صلاحية واحدة أو أكثر:</label>
+                            <div id="newSupervisorRolesGroup" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 bg-[#141a27] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                                    <input type="checkbox" value="admin" class="accent-amber-400 w-4 h-4"> 🛡️ ADMIN (صلاحيات كاملة)
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#141a27] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                                    <input type="checkbox" value="stp_watch_commander" class="accent-amber-400 w-4 h-4"> STP Watch Commander
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#141a27] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                                    <input type="checkbox" value="stp_supervisor" class="accent-amber-400 w-4 h-4"> STP Super Visor
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#141a27] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                                    <input type="checkbox" value="stp" class="accent-amber-400 w-4 h-4"> STP
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#141a27] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                                    <input type="checkbox" value="ldp" class="accent-amber-400 w-4 h-4"> LDP
+                                </label>
+                                <label class="flex items-center gap-2 bg-[#141a27] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                                    <input type="checkbox" value="accounts_only" class="accent-amber-400 w-4 h-4"> Accounts (إدارة الحسابات فقط)
+                                </label>
+                            </div>
+                        </div>
+
+                        <button onclick="createNewAccount()" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-xs transition">حفظ وإنشاء الحساب 💾</button>
+                    </div>
+
+                    <div id="adminsListSection" class="bg-[#141a27] border border-amber-500/30 p-6 rounded-2xl space-y-4 shadow-lg">
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs text-slate-300">
+                                <thead class="bg-[#0c1019] text-amber-400/80 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-3">الاسم / اليونت</th>
+                                        <th class="p-3">اسم المستخدم</th>
+                                        <th class="p-3">نوع الحساب</th>
+                                        <th class="p-3">الصلاحيات</th>
+                                        <th class="p-3 text-center">الخيارات والتحكم</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminsTableBody" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#141a27] border border-blue-500/30 p-6 rounded-2xl space-y-4 shadow-lg">
+                        <h3 class="text-sm font-bold text-blue-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <span>🎓</span> قائمة حسابات المختبرين (الضباط والطلاب)
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs text-slate-300">
+                                <thead class="bg-[#0c1019] text-blue-400/80 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-3">الاسم / اليونت</th>
+                                        <th class="p-3">اسم المستخدم</th>
+                                        <th class="p-3">نوع الحساب</th>
+                                        <th class="p-3">الصلاحيات (الرتبة المتاحة)</th>
+                                        <th class="p-3 text-center">الخيارات والتحكم</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTableBody" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- قسم جديد: المسجلين ببوابة تسجيل البيانات بالصفحة الرئيسية -->
+                    <div id="registrationsListSection" class="bg-[#141a27] border border-emerald-500/30 p-6 rounded-2xl space-y-4 shadow-lg">
+                        <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <span>📋</span> قائمة المسجلين ببوابة تسجيل البيانات (الصفحة الرئيسية)
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs text-slate-300">
+                                <thead class="bg-[#0c1019] text-emerald-400/80 border-b border-slate-800">
+                                    <tr>
+                                        <th class="p-3">الاسم</th>
+                                        <th class="p-3">اليونت / الكود</th>
+                                        <th class="p-3">الرتبة الحالية</th>
+                                        <th class="p-3">الرتبة القادمة</th>
+                                        <th class="p-3">الشهادات المطلوبة</th>
+                                        <th class="p-3">الشهادات الممتلكة</th>
+                                        <th class="p-3">ديسكورد</th>
+                                        <th class="p-3">الصلاحيات المعينة</th>
+                                        <th class="p-3 text-center">إجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="registrationsTableBody" class="divide-y divide-slate-800"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="editUserModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-[#0c1019] border-2 border-amber-400/40 rounded-3xl p-6 w-full max-w-2xl shadow-2xl space-y-5 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeEditModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white font-bold text-lg">✕</button>
+            <h3 class="text-lg font-black text-amber-400 border-b border-slate-800 pb-3 flex items-center gap-2">
+                <span>✏️</span> تعديل الحساب والصلاحيات
+            </h3>
+
+            <input type="hidden" id="editUsernameTarget">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">الاسم الكامل / اليونت:</label>
+                    <input type="text" id="editName" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-2 text-xs text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">كلمة المرور الجديدة (أو ابقها كالمعتاد):</label>
+                    <input type="password" id="editPass" placeholder="••••••••" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-2 text-xs text-white">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1">نوع الحساب:</label>
+                <select id="editRole" onchange="toggleEditModalPermissions()" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-2 text-xs text-white">
+                    <option value="student">🎓 مختبر</option>
+                    <option value="supervisor">🛡️ مشرف</option>
+                </select>
+            </div>
+
+            <div id="editModalPermissionsBox" class="bg-[#141a27] border border-slate-700/60 p-4 rounded-xl space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-amber-400 mb-1">🎯 اختر الرتبة المسموح بها:</label>
+                        <select id="editRankSelect" class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2 text-xs text-white outline-none focus:border-amber-400">
+                            <option value="">-- بدون تحديد رتبة --</option>
+                            <option value="Officer 1">Officer 1</option>
+                            <option value="Officer 2">Officer 2</option>
+                            <option value="Officer 3">Officer 3</option>
+                            <option value="Senior Officer">Senior Officer</option>
+                            <option value="Sergeant">Sergeant</option>
+                            <option value="First Sergeant">First Sergeant</option>
+                            <option value="Staff Sergeant">Staff Sergeant</option>
+                            <option value="Lieutenant">Lieutenant</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-amber-400 mb-1">🏅 الشهادة المسموح بها:</label>
+                        <select id="editCertSelect" class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2 text-xs text-white outline-none focus:border-amber-400">
+                            <option value="">اختر الشهادة...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="editSupervisorRoleBox" class="bg-[#141a27] border border-slate-700/60 p-4 rounded-xl space-y-3 hidden">
+                <label class="block text-xs font-bold text-amber-400 mb-1">🛡️ اختر صلاحية واحدة أو أكثر:</label>
+                <div id="editSupervisorRolesGroup" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                        <input type="checkbox" value="admin" class="accent-amber-400 w-4 h-4"> 🛡️ ADMIN (صلاحيات كاملة)
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                        <input type="checkbox" value="stp_watch_commander" class="accent-amber-400 w-4 h-4"> STP Watch Commander
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                        <input type="checkbox" value="stp_supervisor" class="accent-amber-400 w-4 h-4"> STP Super Visor
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                        <input type="checkbox" value="stp" class="accent-amber-400 w-4 h-4"> STP
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                        <input type="checkbox" value="ldp" class="accent-amber-400 w-4 h-4"> LDP
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-amber-400/50 transition">
+                        <input type="checkbox" value="accounts_only" class="accent-amber-400 w-4 h-4"> Accounts (إدارة الحسابات فقط)
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="saveUserChanges()" class="flex-grow bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">حفظ التغييرات 💾</button>
+                <button onclick="closeEditModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-5 py-2.5 rounded-xl text-xs transition">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal جديد: تعيين صلاحية لشخص مسجل ببوابة تسجيل البيانات (توسيم للعرض والتتبع فقط) -->
+    <div id="editRegistrationRolesModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-[#0c1019] border-2 border-emerald-400/40 rounded-3xl p-6 w-full max-w-lg shadow-2xl space-y-5 relative">
+            <button onclick="closeRegistrationRolesModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white font-bold text-lg">✕</button>
+            <h3 class="text-lg font-black text-emerald-400 border-b border-slate-800 pb-3 flex items-center gap-2">
+                <span>🏷️</span> تعيين الصلاحية للمسجل
+            </h3>
+            <p class="text-xs text-slate-400 -mt-3">هذا فقط توسيم/عرض لتتبع الصلاحية المعطاة لهذا الشخص، ولا ينشئ له حساب دخول منفصل.</p>
+
+            <input type="hidden" id="editRegistrationTarget">
+
+            <div class="bg-[#141a27] border border-slate-700/60 p-4 rounded-xl space-y-3">
+                <label class="block text-xs font-bold text-emerald-400 mb-1">🛡️ اختر صلاحية واحدة أو أكثر:</label>
+                <div id="editRegistrationRolesGroup" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-emerald-400/50 transition">
+                        <input type="checkbox" value="admin" class="accent-emerald-400 w-4 h-4"> 🛡️ ADMIN (صلاحيات كاملة)
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-emerald-400/50 transition">
+                        <input type="checkbox" value="stp_watch_commander" class="accent-emerald-400 w-4 h-4"> STP Watch Commander
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-emerald-400/50 transition">
+                        <input type="checkbox" value="stp_supervisor" class="accent-emerald-400 w-4 h-4"> STP Super Visor
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-emerald-400/50 transition">
+                        <input type="checkbox" value="stp" class="accent-emerald-400 w-4 h-4"> STP
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-emerald-400/50 transition">
+                        <input type="checkbox" value="ldp" class="accent-emerald-400 w-4 h-4"> LDP
+                    </label>
+                    <label class="flex items-center gap-2 bg-[#0c1019] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white cursor-pointer hover:border-emerald-400/50 transition">
+                        <input type="checkbox" value="accounts_only" class="accent-emerald-400 w-4 h-4"> Accounts (إدارة الحسابات فقط)
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="saveRegistrationRoles()" class="flex-grow bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition">حفظ الصلاحيات 💾</button>
+                <button onclick="closeRegistrationRolesModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-5 py-2.5 rounded-xl text-xs transition">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-[#0a0e16] border-t border-slate-800 py-4 text-center text-xs text-slate-500">جميع الحقوق محفوظة © أكاديمية شرطة لوس سانتوس 2026</footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBaoWelTtGQjUBTSDjOIc35DrYap-lyH6c",
+            authDomain: "leadership-professional.firebaseapp.com",
+            databaseURL: "https://leadership-professional-default-rtdb.firebaseio.com",
+            projectId: "leadership-professional",
+            storageBucket: "leadership-professional.firebasestorage.app",
+            messagingSenderId: "620428076068",
+            appId: "1:620428076068:web:f4f0aa97b7282830d1a4b1"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        // ✏️ عدّل هذه القائمة فقط لإضافة/حذف/تغيير أسماء الشهادات، وبتنعكس تلقائياً بكل القوائم المنسدلة
+        const CERTIFICATE_OPTIONS = [
+            "Certified Lead",
+            "Watch Commander",
+            "Supervisor"
+        ];
+
+        // ✏️ تعريف رتب الإشراف الإدارية وصلاحيات كل رتبة (الشهادات المسموح لها بإدارة أسئلتها، والتبويبات المتاحة)
+        const ROLE_CONFIG = {
+            admin: {
+                label: '🛡️ ADMIN (صلاحيات كاملة)',
+                certs: null, // null = كل الشهادات
+                tabs: ['results', 'questions', 'decisions', 'database', 'users'],
+                canManageAccounts: true,
+                canManageSupervisors: true
+            },
+            stp_watch_commander: {
+                label: 'STP Watch Commander',
+                certs: ['Watch Commander'],
+                tabs: ['results', 'questions', 'decisions', 'database'],
+                canManageAccounts: false,
+                canManageSupervisors: false
+            },
+            stp_supervisor: {
+                label: 'STP Super Visor',
+                certs: ['Supervisor'],
+                tabs: ['results', 'questions', 'decisions', 'database'],
+                canManageAccounts: false,
+                canManageSupervisors: false
+            },
+            stp: {
+                label: 'STP',
+                certs: ['Supervisor', 'Watch Commander'],
+                tabs: ['results', 'questions', 'decisions', 'database'],
+                canManageAccounts: false,
+                canManageSupervisors: false
+            },
+            ldp: {
+                label: 'LDP',
+                certs: ['Certified Lead'],
+                tabs: ['results', 'questions', 'decisions', 'database'],
+                canManageAccounts: false,
+                canManageSupervisors: false
+            },
+            accounts_only: {
+                label: 'Accounts',
+                certs: [],
+                tabs: ['users'],
+                canManageAccounts: true,
+                canManageSupervisors: false
+            }
+        };
+
+        let currentRoleConfig = ROLE_CONFIG.admin;
+
+        // يرجع مصفوفة مفاتيح الصلاحيات الفعلية لحساب مشرف معين (يدعم الحسابات القديمة بصلاحية وحيدة والحسابات الجديدة متعددة الصلاحيات)
+        function getEffectiveRoles(user) {
+            if (!user || user.role === 'student') return [];
+            if (Array.isArray(user.roles) && user.roles.length) return user.roles;
+            if (user.role) return [user.role];
+            return [];
+        }
+
+        // يدمج صلاحيات عدة رتب إشرافية في كائن صلاحيات واحد (اتحاد التبويبات والشهادات، وتكفي رتبة واحدة تملك صلاحية لتفعيلها للحساب)
+        function getMergedRoleConfig(roleKeys) {
+            roleKeys = (roleKeys || []).filter(k => ROLE_CONFIG[k]);
+            if (!roleKeys.length) {
+                return { label: 'غير محدد', certs: [], tabs: [], canManageAccounts: false, canManageSupervisors: false };
+            }
+            let tabsSet = new Set();
+            let certsSet = new Set();
+            let allCerts = false;
+            let canManageAccounts = false;
+            let canManageSupervisors = false;
+            let labels = [];
+
+            roleKeys.forEach(key => {
+                let cfg = ROLE_CONFIG[key];
+                cfg.tabs.forEach(t => tabsSet.add(t));
+                if (cfg.certs === null) allCerts = true;
+                else cfg.certs.forEach(c => certsSet.add(c));
+                if (cfg.canManageAccounts) canManageAccounts = true;
+                if (cfg.canManageSupervisors) canManageSupervisors = true;
+                labels.push(cfg.label);
+            });
+
+            return {
+                label: labels.join(' + '),
+                certs: allCerts ? null : Array.from(certsSet),
+                tabs: Array.from(tabsSet),
+                canManageAccounts,
+                canManageSupervisors
+            };
+        }
+
+        // شارة نصية موحّدة لعرض صلاحية واحدة (يعاد استخدامها لحسابات المشرفين ولسجلات بوابة التسجيل)
+        function roleBadgeHTML(key) {
+            let cfg = ROLE_CONFIG[key];
+            if (!cfg) return '';
+            if (key === 'admin') {
+                return `<span class="bg-amber-400/10 border border-amber-400/20 text-amber-400 px-2 py-0.5 rounded text-[11px]">صلاحيات كاملة 🛡️</span>`;
+            } else if (key === 'accounts_only') {
+                return `<span class="bg-purple-500/10 border border-purple-500/20 text-purple-400 px-2 py-0.5 rounded text-[11px]">إدارة الحسابات فقط 👤</span>`;
+            } else {
+                return `<span class="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[11px]">🏅 ${cfg.label}: ${cfg.certs.join(' + ')}</span>`;
+            }
+        }
+
+        function populateCertificateSelects() {
+            let allowedForQuestions = currentRoleConfig.certs === null
+                ? CERTIFICATE_OPTIONS
+                : CERTIFICATE_OPTIONS.filter(c => currentRoleConfig.certs.includes(c));
+
+            let selectMap = {
+                questionCertSelect: allowedForQuestions,
+                newCertSelect: CERTIFICATE_OPTIONS,
+                editCertSelect: CERTIFICATE_OPTIONS
+            };
+
+            Object.keys(selectMap).forEach(id => {
+                let select = document.getElementById(id);
+                if (!select) return;
+                let currentValue = select.value;
+                select.innerHTML = '<option value="">اختر الشهادة...</option>';
+                selectMap[id].forEach(cert => {
+                    let opt = document.createElement('option');
+                    opt.value = cert;
+                    opt.textContent = cert;
+                    select.appendChild(opt);
+                });
+                select.value = currentValue;
+            });
+        }
+
+        // يطبّق صلاحيات رتبة الإشراف المسجّل دخوله: يخفي التبويبات غير المسموحة ويفتح أول تبويب متاح
+        function applyRolePermissions() {
+            let rolesJson = localStorage.getItem('adminRoles');
+            let roleKeys;
+            if (rolesJson) {
+                try { roleKeys = JSON.parse(rolesJson); } catch (e) { roleKeys = null; }
+            }
+            if (!roleKeys || !roleKeys.length) {
+                roleKeys = [localStorage.getItem('adminRole') || 'admin'];
+            }
+            currentRoleConfig = getMergedRoleConfig(roleKeys);
+            if (!currentRoleConfig.tabs.length) currentRoleConfig = ROLE_CONFIG.admin;
+
+            let allTabs = ['results', 'questions', 'decisions', 'database', 'users'];
+            allTabs.forEach(t => {
+                let btn = document.getElementById('tabBtn-' + t);
+                if (!btn) return;
+                if (currentRoleConfig.tabs.includes(t)) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+
+            populateCertificateSelects();
+            applySupervisorManagementRestrictions();
+
+            let firstAllowed = allTabs.find(t => currentRoleConfig.tabs.includes(t));
+            if (firstAllowed) switchTab(firstAllowed);
+        }
+
+        // إذا كانت الرتبة الحالية لا تملك صلاحية إدارة المشرفين (canManageSupervisors = false):
+        // - يخفي قسم "قائمة حسابات المشرفين (الإدارة)"
+        // - يخفي خيار "مشرف" من قائمتي إنشاء الحساب وتعديله (يقدر فقط يتعامل مع حسابات المختبرين)
+        // - يخفي زر "تعيين الصلاحيات" لسجلات بوابة التسجيل (نفس منطق إدارة صلاحيات الإشراف)
+        function applySupervisorManagementRestrictions() {
+            let canManageSupervisors = !!currentRoleConfig.canManageSupervisors;
+
+            let adminsSection = document.getElementById('adminsListSection');
+            if (adminsSection) {
+                adminsSection.classList.toggle('hidden', !canManageSupervisors);
+            }
+
+            ['newUserRole', 'editRole'].forEach(selectId => {
+                let select = document.getElementById(selectId);
+                if (!select) return;
+                let supervisorOption = select.querySelector('option[value="supervisor"]');
+                if (supervisorOption) {
+                    supervisorOption.disabled = !canManageSupervisors;
+                    supervisorOption.classList.toggle('hidden', !canManageSupervisors);
+                }
+                if (!canManageSupervisors && select.value === 'supervisor') {
+                    select.value = 'student';
+                }
+            });
+
+            document.querySelectorAll('.assign-registration-role-btn').forEach(btn => {
+                btn.classList.toggle('hidden', !canManageSupervisors);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAccess();
+        });
+
+        function checkAccess() {
+            if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('adminView').classList.remove('hidden');
+                document.getElementById('errorView').classList.add('hidden');
+                let name = localStorage.getItem('adminName') || 'المشرف';
+                document.getElementById('adminWelcomeName').innerText = "👤 " + name;
+
+                applyRolePermissions();
+                loadRankQuestions();
+                loadSubmissionsData();
+                loadAdminAccounts();
+                loadRegistrations();
+            } else {
+                document.getElementById('errorView').classList.remove('hidden');
+                document.getElementById('adminView').classList.add('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('adminName');
+            localStorage.removeItem('adminRole');
+            localStorage.removeItem('adminRoles');
+            checkAccess();
+            window.location.href = "index.html";
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-400', 'text-slate-950', 'font-black');
+                btn.classList.add('bg-[#0c1019]', 'border-2', 'border-slate-800', 'text-slate-300', 'font-bold');
+            });
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            let activeBtn = document.getElementById('tabBtn-' + tabId);
+            activeBtn.classList.remove('bg-[#0c1019]', 'border-2', 'border-slate-800', 'text-slate-300', 'font-bold');
+            activeBtn.classList.add('bg-amber-400', 'text-slate-950', 'font-black');
+        }
+
+        // يبني كتلة سؤال واحدة: نوع السؤال (اختيارات / مقالي)، نص السؤال، وإذا كان اختيارات: 4 خيارات + تحديد الإجابة الصحيحة
+        function renderQuestionBlock(i, qData) {
+            qData = qData || {};
+            let type = qData.type || 'mcq';
+            let text = (qData.text !== undefined ? qData.text : '') || '';
+            let options = qData.options || ['', '', '', ''];
+            let correct = qData.correct !== undefined ? qData.correct : 0;
+            let timer = qData.timer !== undefined ? qData.timer : 60;
+            let esc = (s) => String(s || '').replace(/"/g, '&quot;');
+
+            return `
+                <div class="bg-[#141a27] p-4 rounded-xl border border-slate-700/60 space-y-3" id="q_block_${i}">
+                    <div class="flex justify-between items-center gap-3 flex-wrap">
+                        <label class="block text-xs font-bold text-amber-400">السؤال رقم (${i}):</label>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <div class="flex items-center gap-1.5">
+                                <label class="text-[11px] font-bold text-slate-400 whitespace-nowrap">مدة السؤال (ثانية):</label>
+                                <input type="number" id="q_timer_${i}" value="${timer}" min="5" max="3600" class="w-20 bg-[#0c1019] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white outline-none focus:border-amber-400">
+                            </div>
+                            <select id="q_type_${i}" onchange="toggleQuestionType(${i})" class="bg-[#0c1019] border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-amber-400">
+                                <option value="mcq" ${type === 'mcq' ? 'selected' : ''}>اختيارات (4 خيارات)</option>
+                                <option value="essay" ${type === 'essay' ? 'selected' : ''}>مقالي</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="text" id="q_title_${i}" value="${esc(text)}" placeholder="اكتب نص السؤال..." class="q-title-input w-full bg-[#0c1019] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-amber-400">
+
+                    <div id="q_options_${i}" class="space-y-2 ${type === 'essay' ? 'hidden' : ''}">
+                        <label class="block text-[11px] font-bold text-slate-400">الخيارات الأربعة:</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <input type="text" id="q_opt_${i}_0" value="${esc(options[0])}" placeholder="الخيار الأول" class="q-opt-input bg-[#0c1019] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-amber-400">
+                            <input type="text" id="q_opt_${i}_1" value="${esc(options[1])}" placeholder="الخيار الثاني" class="q-opt-input bg-[#0c1019] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-amber-400">
+                            <input type="text" id="q_opt_${i}_2" value="${esc(options[2])}" placeholder="الخيار الثالث" class="q-opt-input bg-[#0c1019] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-amber-400">
+                            <input type="text" id="q_opt_${i}_3" value="${esc(options[3])}" placeholder="الخيار الرابع" class="q-opt-input bg-[#0c1019] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-amber-400">
+                        </div>
+                        <label class="block text-[11px] font-bold text-emerald-400 pt-1">حدد الإجابة الصحيحة:</label>
+                        <select id="q_correct_${i}" class="w-full bg-[#0c1019] border border-emerald-500/40 rounded-lg px-3 py-2 text-xs text-emerald-300 outline-none focus:border-emerald-400">
+                            <option value="0" ${correct == 0 ? 'selected' : ''}>الخيار الأول</option>
+                            <option value="1" ${correct == 1 ? 'selected' : ''}>الخيار الثاني</option>
+                            <option value="2" ${correct == 2 ? 'selected' : ''}>الخيار الثالث</option>
+                            <option value="3" ${correct == 3 ? 'selected' : ''}>الخيار الرابع</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleQuestionType(i) {
+            let type = document.getElementById('q_type_' + i).value;
+            let box = document.getElementById('q_options_' + i);
+            if (type === 'essay') {
+                box.classList.add('hidden');
+            } else {
+                box.classList.remove('hidden');
+            }
+        }
+
+        function generateQuestionInputs() {
+            let count = parseInt(document.getElementById('questionCountInput').value) || 1;
+            let container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= count; i++) {
+                container.insertAdjacentHTML('beforeend', renderQuestionBlock(i, {}));
+            }
+        }
+
+        function loadRankQuestions() {
+            let rank = document.getElementById('questionRankSelect').value;
+            let cert = document.getElementById('questionCertSelect').value;
+            let container = document.getElementById('questionsContainer');
+
+            if (!cert) {
+                container.innerHTML = `<div class="text-center text-slate-500 py-6">يرجى اختيار الشهادة أولاً لعرض/إضافة أسئلتها.</div>`;
+                return;
+            }
+
+            db.ref('lspd_questions/' + rank + '/' + cert).once('value').then(snapshot => {
+                let data = snapshot.val();
+                container.innerHTML = '';
+
+                if (data) {
+                    if (data.timer) document.getElementById('timerMinutesInput').value = data.timer;
+                    if (data.passScore !== undefined) document.getElementById('passScoreInput').value = data.passScore;
+                    
+                    let list = data.questions || [];
+                    document.getElementById('questionCountInput').value = list.length || 3;
+
+                    list.forEach((q, index) => {
+                        let i = index + 1;
+                        let qData = (typeof q === 'string') ? { type: 'essay', text: q } : q;
+                        container.insertAdjacentHTML('beforeend', renderQuestionBlock(i, qData));
+                    });
+                } else {
+                    generateQuestionInputs();
+                }
+            });
+        }
+
+        function saveRankQuestions() {
+            let rank = document.getElementById('questionRankSelect').value;
+            let cert = document.getElementById('questionCertSelect').value;
+
+            if (!cert) {
+                alert("يرجى اختيار الشهادة أولاً قبل حفظ الأسئلة!");
+                return;
+            }
+
+            if (currentRoleConfig.certs !== null && !currentRoleConfig.certs.includes(cert)) {
+                alert("رتبتك الإشرافية لا تملك صلاحية إدارة أسئلة هذه الشهادة!");
+                return;
+            }
+
+            let timer = parseInt(document.getElementById('timerMinutesInput').value) || 5;
+            let passScore = parseInt(document.getElementById('passScoreInput').value) || 70;
+            let blocks = document.querySelectorAll('[id^="q_block_"]');
+            let questions = [];
+
+            blocks.forEach(block => {
+                let i = block.id.replace('q_block_', '');
+                let type = document.getElementById('q_type_' + i).value;
+                let text = document.getElementById('q_title_' + i).value.trim();
+                let qTimer = parseInt(document.getElementById('q_timer_' + i).value) || 60;
+                if (text === '') return;
+
+                if (type === 'essay') {
+                    questions.push({ type: 'essay', text: text, timer: qTimer });
+                } else {
+                    let options = [0, 1, 2, 3].map(idx => document.getElementById('q_opt_' + i + '_' + idx).value.trim());
+                    let correct = parseInt(document.getElementById('q_correct_' + i).value);
+                    questions.push({ type: 'mcq', text: text, options: options, correct: correct, timer: qTimer });
+                }
+            });
+
+            db.ref('lspd_questions/' + rank + '/' + cert).set({
+                timer: timer,
+                passScore: passScore,
+                questions: questions
+            }).then(() => {
+                alert("تم حفظ الأسئلة والوقت ونسبة النجاح المحددة بنجاح! 💾");
+            }).catch(err => {
+                alert("حدث خطأ أثناء الحفظ: " + err.message);
+            });
+        }
+
+        function loadSubmissionsData() {
+            db.ref('lspd_submissions').on('value', snapshot => {
+                let resultsList = document.getElementById('resultsList');
+                let decisionsList = document.getElementById('decisionsList');
+                let databaseTableBody = document.getElementById('databaseTableBody');
+
+                resultsList.innerHTML = '';
+                decisionsList.innerHTML = '';
+                databaseTableBody.innerHTML = '';
+
+                let data = snapshot.val() || {};
+                let allKeys = Object.keys(data);
+
+                // 🔒 فلترة السجلات حسب الشهادات المسموح لصلاحية المشرف الحالي بالإطلاع عليها.
+                // مثال: مشرف عنده رتبة Watch Commander فقط، يشوف فقط طلبات شهادة Watch Commander
+                // في هذه الصفحات الثلاث (تقييم النتائج، القبول والرفض، بيانات المختبرين).
+                let keys = allKeys.filter(subId => {
+                    let cert = data[subId] && data[subId].certificateType;
+                    return currentRoleConfig.certs === null || currentRoleConfig.certs.includes(cert);
+                });
+
+                if (keys.length === 0) {
+                    resultsList.innerHTML = `<div class="text-center text-slate-500 py-6">لا توجد اختبارات مرفوعة حالياً ضمن صلاحياتك.</div>`;
+                    decisionsList.innerHTML = `<div class="text-center text-slate-500 py-6">لا توجد طلبات معالجة ضمن صلاحياتك.</div>`;
+                    databaseTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-slate-500 py-4">لا توجد سجلات ضمن صلاحياتك.</td></tr>`;
+                    return;
+                }
+
+                keys.forEach(subId => {
+                    let item = data[subId];
+                    let dateText = item.timestamp ? new Date(item.timestamp).toLocaleString('ar-EG') : '';
+
+                    let answersHtml = `
+                        <div class="bg-[#0c1019] p-3 rounded-lg border border-slate-800 space-y-1.5">
+                            <div class="text-xs font-bold text-amber-400">📝 الإجابات النظرية</div>
+                            <div class="text-xs text-slate-200 leading-relaxed">${item.theoryAnswersHTML || 'لا توجد إجابات نظرية.'}</div>
+                        </div>
+                        <div class="bg-[#0c1019] p-3 rounded-lg border border-slate-800 space-y-1.5">
+                            <div class="text-xs font-bold text-amber-400">🗂️ التقرير العملي (MDT)</div>
+                            <div class="text-xs text-slate-200 leading-relaxed">${item.mdtReportHTML || 'لا يوجد تقرير.'}</div>
+                        </div>
+                    `;
+
+                    let resCard = document.createElement('div');
+                    resCard.className = "bg-[#141a27] border border-slate-800 p-5 rounded-2xl space-y-4 shadow-md";
+                    resCard.innerHTML = `
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3 flex-wrap gap-2">
+                            <div>
+                                <span class="font-black text-white text-base">${item.fullName || 'غير معروف'}</span>
+                                <span class="text-xs text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded ml-2">${item.targetRank || 'رتبة'}</span>
+                                <span class="text-xs text-blue-400 bg-blue-400/10 border border-blue-400/20 px-2 py-0.5 rounded ml-2">🏅 ${item.certificateType || 'N/A'}</span>
+                                <span class="text-xs text-slate-400"> | اليونت: ${item.callSign || 'N/A'} | ديسكورد: ${item.discordUser || 'N/A'}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-500">${dateText}</span>
+                                <button onclick="toggleResultDetails('${subId}')" id="toggleBtn_${subId}" class="bg-[#0c1019] border border-slate-700 hover:border-amber-400 text-slate-300 hover:text-amber-400 font-bold px-3 py-1.5 rounded-lg text-xs transition">إخفاء التفاصيل 🔼</button>
+                            </div>
+                        </div>
+                        <div id="detailsBox_${subId}" class="space-y-2">${answersHtml}</div>
+                        <div class="flex items-center gap-3 pt-2">
+                            <input type="number" id="score_input_${subId}" value="${item.score !== undefined ? item.score : ''}" placeholder="النسبة %" class="w-28 bg-[#0c1019] border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+                            <button onclick="saveStudentScore('${subId}')" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold px-4 py-1.5 rounded-lg text-xs transition">اعتماد النسبة 💾</button>
+                        </div>
+                    `;
+                    resultsList.appendChild(resCard);
+
+                    let statusBadge = item.status ? `<span class="text-xs px-2 py-1 rounded font-bold ${item.status === 'مقبول' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : item.status === 'مرفوض' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">${item.status}</span>` : '<span class="text-xs text-slate-500">قيد الانتظار</span>';
+
+                    let decCard = document.createElement('div');
+                    decCard.className = "bg-[#141a27] border border-slate-800 p-4 rounded-2xl flex justify-between items-center gap-4 flex-wrap";
+                    decCard.innerHTML = `
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div>
+                                <span class="font-bold text-white text-sm">${item.fullName || 'مختبر'}</span>
+                                <span class="text-xs text-slate-400 border-r border-slate-700 pr-2 mr-2">الرتبة: ${item.targetRank || 'N/A'}</span>
+                                <span class="text-xs text-blue-400 border-r border-slate-700 pr-2 mr-2">🏅 ${item.certificateType || 'N/A'}</span>
+                                <span class="text-xs text-slate-400 border-r border-slate-700 pr-2 mr-2">اليونت: ${item.callSign || 'N/A'}</span>
+                                <span class="text-xs text-slate-400 border-r border-slate-700 pr-2 mr-2">ديسكورد: ${item.discordUser || 'N/A'}</span>
+                                <span class="text-xs text-amber-400 font-bold border-r border-slate-700 pr-2 mr-2">النسبة: ${item.score !== undefined ? item.score + '%' : 'لم تقيم بعد'}</span>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="updateDecision('${subId}', 'مقبول')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition">قبول ✅</button>
+                            <button onclick="updateDecision('${subId}', 'مرفوض')" class="bg-red-600 hover:bg-red-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition">رفض ❌</button>
+                            <button onclick="updateDecision('${subId}', 'فرصة ثانية')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition">فرصة ثانية 🔄</button>
+                        </div>
+                    `;
+                    decisionsList.appendChild(decCard);
+
+                    let tr = document.createElement('tr');
+                    tr.className = "hover:bg-[#141a27]/50 transition";
+                    let scoreText = item.score !== undefined ? item.score + '%' : 'غير مقيم';
+                    let qualification = item.score !== undefined ? (item.score >= 70 ? 'مؤهل' : 'غير مؤهل') : '-';
+                    let decisionText = item.status || 'معلق';
+
+                    tr.innerHTML = `
+                        <td class="p-3.5 font-bold text-white">${item.fullName || 'N/A'}<div class="text-[10px] text-slate-500 font-normal">${item.discordUser || ''}</div></td>
+                        <td class="p-3.5">${item.targetRank || 'N/A'}<div class="text-[10px] text-blue-400">${item.certificateType || ''}</div></td>
+                        <td class="p-3.5 text-slate-400">${item.callSign || 'N/A'}</td>
+                        <td class="p-3.5 text-amber-400 font-bold">${scoreText}</td>
+                        <td class="p-3.5">${qualification}</td>
+                        <td class="p-3.5 font-bold">${decisionText}</td>
+                        <td class="p-3.5 text-center">
+                            <button onclick="deleteSubmission('${subId}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-2.5 py-1 rounded-lg transition text-xs">حذف 🗑️</button>
+                        </td>
+                    `;
+                    databaseTableBody.appendChild(tr);
+                });
+            });
+        }
+
+        function toggleResultDetails(subId) {
+            let box = document.getElementById('detailsBox_' + subId);
+            let btn = document.getElementById('toggleBtn_' + subId);
+            if (!box || !btn) return;
+            let isHidden = box.classList.toggle('hidden');
+            btn.innerText = isHidden ? 'إظهار التفاصيل 🔽' : 'إخفاء التفاصيل 🔼';
+        }
+
+        function saveStudentScore(subId) {
+            let scoreVal = document.getElementById('score_input_' + subId).value;
+            if (scoreVal === '') {
+                alert("يرجى إدخال النسبة أولاً!");
+                return;
+            }
+            db.ref('lspd_submissions/' + subId).update({
+                score: parseInt(scoreVal)
+            }).then(() => {
+                alert("تم إعتماد النسبة بنجاح!");
+            }).catch(err => {
+                alert("حدث خطأ أثناء تحديث النسبة: " + err.message);
+            });
+        }
+
+        function updateDecision(subId, status) {
+            db.ref('lspd_submissions/' + subId).update({
+                status: status
+            }).then(() => {
+                alert("تم تحديث القرار إلى: " + status);
+            }).catch(err => {
+                alert("حدث خطأ أثناء التحديث: " + err.message);
+            });
+        }
+
+        function deleteSubmission(subId) {
+            if (confirm("هل أنت تأكد من إزالة هذا السجل بشكل نهائي؟")) {
+                db.ref('lspd_submissions/' + subId).remove().then(() => {
+                    alert("تم الحذف بنجاح!");
+                }).catch(err => {
+                    alert("حدث خطأ أثناء الحذف: " + err.message);
+                });
+            }
+        }
+
+        function togglePermissionsView() {
+            let role = document.getElementById('newUserRole').value;
+            let studentBox = document.getElementById('studentPermissionsBox');
+            let supervisorBox = document.getElementById('supervisorRoleBox');
+            if (role === 'student') {
+                studentBox.classList.remove('hidden');
+                supervisorBox.classList.add('hidden');
+            } else if (role === 'supervisor') {
+                studentBox.classList.add('hidden');
+                supervisorBox.classList.remove('hidden');
+            } else {
+                studentBox.classList.add('hidden');
+                supervisorBox.classList.add('hidden');
+            }
+        }
+
+        // يرجع مصفوفة القيم المحددة (checked) من مجموعة checkboxes معينة
+        function getCheckedValues(groupId) {
+            let group = document.getElementById(groupId);
+            if (!group) return [];
+            return Array.from(group.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+        }
+
+        // يحدد/يفرغ مجموعة checkboxes بناءً على مصفوفة قيم
+        function setCheckedValues(groupId, values) {
+            let group = document.getElementById(groupId);
+            if (!group) return;
+            values = values || [];
+            group.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = values.includes(cb.value);
+            });
+        }
+
+        function createNewAccount() {
+            let role = document.getElementById('newUserRole').value;
+            let name = document.getElementById('newAdminName').value.trim();
+            let username = document.getElementById('newAdminUser').value.trim();
+            let pass = document.getElementById('newAdminPass').value.trim();
+
+            if (!name || !username || !pass) {
+                alert("يرجى ملء كافة البيانات المطلوبة!");
+                return;
+            }
+
+            if (role === 'supervisor' && !currentRoleConfig.canManageSupervisors) {
+                alert("ليس لديك صلاحية إنشاء حسابات إشراف!");
+                return;
+            }
+
+            let userData = {
+                name: name,
+                username: username,
+                password: pass
+            };
+
+            if (role === 'student') {
+                userData.role = 'student';
+                userData.allowedRank = document.getElementById('newRankSelect').value;
+                userData.allowedCertificate = document.getElementById('newCertSelect').value;
+            } else {
+                // حساب مشرف: يقدر ياخذ أكثر من صلاحية إشرافية بنفس الوقت
+                let selectedRoles = getCheckedValues('newSupervisorRolesGroup');
+                if (!selectedRoles.length) {
+                    alert("يرجى اختيار صلاحية إشرافية واحدة على الأقل!");
+                    return;
+                }
+                userData.roles = selectedRoles;
+                userData.role = selectedRoles[0]; // للتوافق مع الأجزاء القديمة من الكود
+            }
+
+            db.ref('lspd_users/' + username).set(userData).then(() => {
+                alert("تم إنشاء الحساب بنجاح! 👤");
+                document.getElementById('newAdminName').value = '';
+                document.getElementById('newAdminUser').value = '';
+                document.getElementById('newAdminPass').value = '';
+                setCheckedValues('newSupervisorRolesGroup', []);
+            }).catch(err => {
+                alert("حدث خطأ أثناء إنشاء الحساب: " + err.message);
+            });
+        }
+
+        function loadAdminAccounts() {
+            db.ref('lspd_users').on('value', snapshot => {
+                let adminsTableBody = document.getElementById('adminsTableBody');
+                let studentsTableBody = document.getElementById('studentsTableBody');
+
+                adminsTableBody.innerHTML = '';
+                studentsTableBody.innerHTML = '';
+
+                let data = snapshot.val() || {};
+                let keys = Object.keys(data);
+
+                let hasAdmins = false;
+                let hasStudents = false;
+
+                keys.forEach(username => {
+                    let u = data[username];
+                    let isStudent = u.role === 'student';
+
+                    let tr = document.createElement('tr');
+                    tr.className = "hover:bg-[#0c1019]/50 transition border-b border-slate-800/40";
+
+                    if (isStudent) {
+                        hasStudents = true;
+                        let rankText = u.allowedRank ? `رتبة: ${u.allowedRank}` : 'لا توجد';
+                        let permissions = `<span class="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[11px]">${rankText}</span>`;
+                        if (u.allowedCertificate) {
+                            permissions += ` <span class="bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[11px]">🏅 ${u.allowedCertificate}</span>`;
+                        }
+
+                        tr.innerHTML = `
+                            <td class="p-3 font-bold text-white">${u.name || 'N/A'}</td>
+                            <td class="p-3 text-slate-400">${username}</td>
+                            <td class="p-3 text-blue-400 font-bold">مختبر</td>
+                            <td class="p-3">${permissions}</td>
+                            <td class="p-3 text-center space-x-1 space-x-reverse">
+                                <button onclick="openEditModal('${username}')" class="bg-amber-400/10 hover:bg-amber-400 text-amber-400 hover:text-slate-950 border border-amber-400/20 px-2.5 py-1 rounded-lg transition text-xs font-bold">تعديل ✏️</button>
+                                <button onclick="deleteAccount('${username}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-2.5 py-1 rounded-lg transition text-xs">حذف 🗑️</button>
+                            </td>
+                        `;
+                        studentsTableBody.appendChild(tr);
+                    } else {
+                        hasAdmins = true;
+                        let userRoleKeys = getEffectiveRoles(u);
+                        let mergedCfg = getMergedRoleConfig(userRoleKeys);
+                        let roleLabel = mergedCfg.label || 'غير محدد';
+
+                        // شارة لكل صلاحية على حدة (يدعم عرض أكثر من صلاحية إشرافية بنفس الحساب)
+                        let permissionsBadge = userRoleKeys.map(key => roleBadgeHTML(key)).join(' ');
+
+                        tr.innerHTML = `
+                            <td class="p-3 font-bold text-white">${u.name || 'N/A'}</td>
+                            <td class="p-3 text-slate-400">${username}</td>
+                            <td class="p-3 text-amber-400 font-bold">${roleLabel}</td>
+                            <td class="p-3">${permissionsBadge}</td>
+                            <td class="p-3 text-center space-x-1 space-x-reverse">
+                                <button onclick="openEditModal('${username}')" class="bg-amber-400/10 hover:bg-amber-400 text-amber-400 hover:text-slate-950 border border-amber-400/20 px-2.5 py-1 rounded-lg transition text-xs font-bold">تعديل ✏️</button>
+                                <button onclick="deleteAccount('${username}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-2.5 py-1 rounded-lg transition text-xs">حذف 🗑️</button>
+                            </td>
+                        `;
+                        adminsTableBody.appendChild(tr);
+                    }
+                });
+
+                if (!hasAdmins) {
+                    adminsTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-slate-500 py-3">لا يوجد حسابات مشرفين.</td></tr>`;
+                }
+                if (!hasStudents) {
+                    studentsTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-slate-500 py-3">لا يوجد حسابات مختبرين.</td></tr>`;
+                }
+            });
+        }
+
+        // ===== قسم جديد: سجلات بوابة تسجيل البيانات بالصفحة الرئيسية (lspd_registrations) =====
+        function loadRegistrations() {
+            db.ref('lspd_registrations').on('value', snapshot => {
+                let tbody = document.getElementById('registrationsTableBody');
+                tbody.innerHTML = '';
+
+                let data = snapshot.val() || {};
+                let keys = Object.keys(data);
+
+                if (!keys.length) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-slate-500 py-3">لا يوجد مسجلين بعد.</td></tr>`;
+                    return;
+                }
+
+                keys.forEach(discordUser => {
+                    let r = data[discordUser];
+                    let requiredCerts = Array.isArray(r.requiredCerts) ? r.requiredCerts.join('، ') : '-';
+                    let possessedCerts = Array.isArray(r.possessedCerts) ? r.possessedCerts.join('، ') : '-';
+                    let assignedRoles = Array.isArray(r.assignedRoles) ? r.assignedRoles : [];
+                    let rolesBadges = assignedRoles.length ? assignedRoles.map(key => roleBadgeHTML(key)).join(' ') : '<span class="text-slate-500 text-[11px]">لا يوجد</span>';
+
+                    let tr = document.createElement('tr');
+                    tr.className = "hover:bg-[#0c1019]/50 transition border-b border-slate-800/40";
+                    tr.innerHTML = `
+                        <td class="p-3 font-bold text-white">${r.fullName || 'N/A'}</td>
+                        <td class="p-3 text-slate-400">${r.unitCode || 'N/A'}</td>
+                        <td class="p-3">${r.currentRank || 'N/A'}</td>
+                        <td class="p-3">${r.nextRank || 'N/A'}</td>
+                        <td class="p-3 text-amber-400">${requiredCerts}</td>
+                        <td class="p-3 text-emerald-400">${possessedCerts}</td>
+                        <td class="p-3 text-slate-400">${discordUser}</td>
+                        <td class="p-3">${rolesBadges}</td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                <button onclick="openRegistrationRolesModal('${discordUser}')" class="assign-registration-role-btn bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 border border-emerald-500/20 px-2.5 py-1 rounded-lg transition text-xs font-bold">تعيين الصلاحيات 🏷️</button>
+                                <button onclick="deleteRegistration('${discordUser}')" class="assign-registration-role-btn bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 px-2.5 py-1 rounded-lg transition text-xs font-bold">حذف 🗑️</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                applySupervisorManagementRestrictions();
+            });
+        }
+
+        function openRegistrationRolesModal(discordUser) {
+            if (!currentRoleConfig.canManageSupervisors) {
+                alert("ليس لديك صلاحية تعيين الصلاحيات!");
+                return;
+            }
+            db.ref('lspd_registrations/' + discordUser).once('value').then(snapshot => {
+                let r = snapshot.val();
+                if (!r) return;
+                document.getElementById('editRegistrationTarget').value = discordUser;
+                setCheckedValues('editRegistrationRolesGroup', r.assignedRoles || []);
+                document.getElementById('editRegistrationRolesModal').classList.remove('hidden');
+            });
+        }
+
+        function closeRegistrationRolesModal() {
+            document.getElementById('editRegistrationRolesModal').classList.add('hidden');
+        }
+
+        function saveRegistrationRoles() {
+            let discordUser = document.getElementById('editRegistrationTarget').value;
+            let selectedRoles = getCheckedValues('editRegistrationRolesGroup');
+
+            db.ref('lspd_registrations/' + discordUser).update({
+                assignedRoles: selectedRoles
+            }).then(() => {
+                alert("تم حفظ الصلاحيات بنجاح! 💾");
+                closeRegistrationRolesModal();
+            }).catch(err => {
+                alert("حدث خطأ أثناء الحفظ: " + err.message);
+            });
+        }
+
+        function deleteRegistration(discordUser) {
+            if (!currentRoleConfig.canManageSupervisors) {
+                alert("ليس لديك صلاحية حذف سجلات التسجيل!");
+                return;
+            }
+            if (confirm("هل أنت متأكد من حذف سجل التسجيل الخاص بـ (" + discordUser + ")؟")) {
+                db.ref('lspd_registrations/' + discordUser).remove().then(() => {
+                    alert("تم حذف السجل بنجاح!");
+                }).catch(err => {
+                    alert("حدث خطأ أثناء الحذف: " + err.message);
+                });
+            }
+        }
+
+        function deleteAccount(username) {
+            db.ref('lspd_users/' + username).once('value').then(snapshot => {
+                let user = snapshot.val();
+                let actualRole = (user && user.role) || 'student';
+
+                if (actualRole !== 'student' && !currentRoleConfig.canManageSupervisors) {
+                    alert("ليس لديك صلاحية حذف حسابات الإشراف!");
+                    return;
+                }
+
+                if (confirm("هل أنت تأكد من إزالة الحساب (" + username + ")؟")) {
+                    db.ref('lspd_users/' + username).remove().then(() => {
+                        alert("تم حذف الحساب بنجاح!");
+                    }).catch(err => {
+                        alert("حدث خطأ أثناء الحذف: " + err.message);
+                    });
+                }
+            });
+        }
+
+        function openEditModal(username) {
+            db.ref('lspd_users/' + username).once('value').then(snapshot => {
+                let user = snapshot.val();
+                if (!user) return;
+
+                let actualRole = user.role || 'student';
+
+                if (actualRole !== 'student' && !currentRoleConfig.canManageSupervisors) {
+                    alert("ليس لديك صلاحية تعديل حسابات الإشراف!");
+                    return;
+                }
+
+                document.getElementById('editUsernameTarget').value = username;
+                document.getElementById('editName').value = user.name || '';
+                document.getElementById('editPass').value = '';
+
+                if (actualRole === 'student') {
+                    document.getElementById('editRole').value = 'student';
+                } else {
+                    document.getElementById('editRole').value = 'supervisor';
+                    setCheckedValues('editSupervisorRolesGroup', getEffectiveRoles(user));
+                }
+
+                document.getElementById('editRankSelect').value = user.allowedRank || '';
+                document.getElementById('editCertSelect').value = user.allowedCertificate || '';
+
+                toggleEditModalPermissions();
+                document.getElementById('editUserModal').classList.remove('hidden');
+            });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editUserModal').classList.add('hidden');
+        }
+
+        function toggleEditModalPermissions() {
+            let role = document.getElementById('editRole').value;
+            let studentBox = document.getElementById('editModalPermissionsBox');
+            let supervisorBox = document.getElementById('editSupervisorRoleBox');
+            if (role === 'student') {
+                studentBox.classList.remove('hidden');
+                supervisorBox.classList.add('hidden');
+            } else if (role === 'supervisor') {
+                studentBox.classList.add('hidden');
+                supervisorBox.classList.remove('hidden');
+            } else {
+                studentBox.classList.add('hidden');
+                supervisorBox.classList.add('hidden');
+            }
+        }
+
+        function saveUserChanges() {
+            let username = document.getElementById('editUsernameTarget').value;
+            let name = document.getElementById('editName').value.trim();
+            let pass = document.getElementById('editPass').value.trim();
+            let role = document.getElementById('editRole').value;
+
+            if (!name) {
+                alert("يرجى إدخال الاسم كاملاً!");
+                return;
+            }
+
+            if (role === 'supervisor' && !currentRoleConfig.canManageSupervisors) {
+                alert("ليس لديك صلاحية تحويل أو إدارة حسابات الإشراف!");
+                return;
+            }
+
+            let updates = {
+                name: name
+            };
+
+            if (pass !== '') {
+                updates.password = pass;
+            }
+
+            if (role === 'student') {
+                updates.role = 'student';
+                updates.roles = null;
+                updates.allowedRank = document.getElementById('editRankSelect').value;
+                updates.allowedCertificate = document.getElementById('editCertSelect').value;
+            } else {
+                // حساب مشرف: يقدر ياخذ أكثر من صلاحية إشرافية بنفس الوقت
+                let selectedRoles = getCheckedValues('editSupervisorRolesGroup');
+                if (!selectedRoles.length) {
+                    alert("يرجى اختيار صلاحية إشرافية واحدة على الأقل!");
+                    return;
+                }
+                updates.roles = selectedRoles;
+                updates.role = selectedRoles[0]; // للتوافق مع الأجزاء القديمة من الكود
+                updates.allowedRank = null;
+                updates.allowedCertificate = null;
+            }
+
+            db.ref('lspd_users/' + username).update(updates).then(() => {
+                alert("تم حفظ التعديلات بنجاح! 💾");
+                closeEditModal();
+            }).catch(err => {
+                alert("حدث خطأ أثناء التعديل: " + err.message);
+            });
+        }
+    </script>
+</body>
+</html>
