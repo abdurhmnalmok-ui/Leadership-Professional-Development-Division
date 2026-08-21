@@ -69,9 +69,9 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الرتبة المستهدفة (مقيدة):</label>
-                    <select id="targetRank" disabled class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed focus:outline-none">
-                        <option value="">جاري قراءة البيانات...</option>
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الرتبة المستهدفة:</label>
+                    <select id="targetRank" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer">
+                        <option value="" disabled selected>اختر الرتبة المستهدفة...</option>
                         <option value="Officer 1">Officer 1</option>
                         <option value="Officer 2">Officer 2</option>
                         <option value="Officer 3">Officer 3</option>
@@ -83,9 +83,9 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الشهادة المقدم عليها (مقيدة):</label>
-                    <select id="certificateType" disabled class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-amber-400 font-bold cursor-not-allowed focus:outline-none">
-                        <option value="">جاري قراءة البيانات...</option>
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الشهادة المقدم عليها:</label>
+                    <select id="certificateType" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer">
+                        <option value="" disabled selected>اختر الشهادة...</option>
                         <option value="Certified Lead">Certified Lead</option>
                         <option value="Watch Commander">Watch Commander</option>
                         <option value="Supervisor">Supervisor</option>
@@ -311,7 +311,7 @@
                 return;
             }
 
-            // جلب وتقييد بيانات الرتبة والشهادة المخصصة للمختبر فور تسجيل الدخول
+            // جلب البيانات مع ترك القوائم قابلة للاختيار والتعديل
             db.ref('lspd_users/' + studentAccountUser).once('value').then(snapshot => {
                 let userData = snapshot.val();
                 if (userData) {
@@ -366,8 +366,6 @@
             db.ref('lspd_submissions').once('value').then(snapshot => {
                 let submissions = snapshot.val() || {};
                 
-                // السماح لمن لديه قرار سابق ("فرصة ثانية", "مقبول", "مرفوض") بخوض اختبار جديد.
-                // يتم حظر المختبر فقط إذا كان لديه طلب قيد المراجعة (!s.status)
                 let activeSub = Object.values(submissions).find(s => 
                     s && s.accountUsername === studentAccountUser && !s.status
                 );
@@ -385,8 +383,6 @@
                     }
 
                     let timerMinutes = savedData.timer || savedData.timerMinutes || 5;
-                    
-                    // حساب زمن السؤال بالثواني بناءً على مجموع الوقت المدخل مقسوماً على عدد الأسئلة بدون حد أدنى 15 ثانية
                     secondsPerQuestion = Math.floor((timerMinutes * 60) / savedData.questions.length);
 
                     currentExamData = { fullName, callSign, discordUser, targetRank, certificateType, questionsList: savedData.questions };
