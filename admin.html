@@ -333,12 +333,27 @@
                                     <span class="border px-3 py-1 rounded-full text-xs font-bold ${statusColor}">${item.status}</span>
                                     <button onclick="updateStatus('${key}', 'مقبول')" class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">قبول</button>
                                     <button onclick="updateStatus('${key}', 'مرفوض')" class="bg-red-600/20 text-red-400 border border-red-500/40 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">رفض</button>
-                                    <button onclick="updateStatus('${key}', 'فرصة ثانية')" class="bg-amber-600/20 text-amber-400 border border-amber-500/40 hover:bg-amber-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">إعطاء فرصة ثانية 🔄</button>
+                                    <button onclick="giveSecondChance('${key}')" class="bg-amber-600/20 text-amber-400 border border-amber-500/40 hover:bg-amber-600 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">إعطاء فرصة ثانية 🔄</button>
                                 </div>
                             </div>
                         `;
                     }
                 });
+            });
+        }
+
+        function giveSecondChance(submissionKey) {
+            if (!confirm("هل أنت متأكد من إعطاء فرصة ثانية لهذا المتقدم؟ سيتمكن من إعادة الاختبار فوراً.")) {
+                return;
+            }
+
+            db.ref('lspd_submissions/' + submissionKey).update({
+                status: 'فرصة ثانية',
+                reviewedAt: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                alert("تمت إضافة قرار (فرصة ثانية) بنجاح!");
+            }).catch(err => {
+                alert("حدث خطأ أثناء تحديث الحالة: " + err.message);
             });
         }
 
