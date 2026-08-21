@@ -10,7 +10,7 @@
 </head>
 <body class="bg-[#080B12] text-slate-200 font-sans antialiased min-h-screen">
 
-    <!-- Registration Gate -->
+    <!-- Registration Gate: يظهر لأي زائر قبل ما يشوف أي محتوى بالموقع -->
     <div id="registrationGate" class="fixed inset-0 z-[999] bg-[#080B12] overflow-y-auto">
         <div class="min-h-screen flex items-center justify-center p-4">
             <div class="bg-[#0c1019] border-2 border-slate-800 rounded-3xl shadow-2xl w-full max-w-2xl p-8 space-y-6 my-8">
@@ -58,6 +58,37 @@
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-[#141a27] border border-slate-700 rounded-xl p-4 space-y-2">
+                            <label class="block text-xs font-bold text-amber-400 mb-1">الشهادات المطلوبة:</label>
+                            <div id="regRequiredCertsGroup" class="space-y-1.5">
+                                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                                    <input type="checkbox" value="Certified Lead" class="accent-amber-400 w-4 h-4"> Certified Lead
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                                    <input type="checkbox" value="Watch Commander" class="accent-amber-400 w-4 h-4"> Watch Commander
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                                    <input type="checkbox" value="Supervisor" class="accent-amber-400 w-4 h-4"> Supervisor
+                                </label>
+                            </div>
+                        </div>
+                        <div class="bg-[#141a27] border border-slate-700 rounded-xl p-4 space-y-2">
+                            <label class="block text-xs font-bold text-emerald-400 mb-1">الشهادات الممتلكة:</label>
+                            <div id="regPossessedCertsGroup" class="space-y-1.5">
+                                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                                    <input type="checkbox" value="Certified Lead" class="accent-emerald-400 w-4 h-4"> Certified Lead
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                                    <input type="checkbox" value="Watch Commander" class="accent-emerald-400 w-4 h-4"> Watch Commander
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                                    <input type="checkbox" value="Supervisor" class="accent-emerald-400 w-4 h-4"> Supervisor
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-1.5">يوزر حساب الديسكورد:</label>
                         <input type="text" id="regDiscordUser" placeholder="مثال: username" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400">
@@ -97,45 +128,149 @@
                 <button id="logoutBtn" onclick="logoutUser()" class="hidden bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 text-xs font-bold px-4 py-2 rounded-xl transition">
                     تسجيل الخروج
                 </button>
+
+                <div class="flex items-center gap-3 border-r border-slate-800 pr-4">
+                    <div class="w-11 h-11 rounded-full border-2 border-slate-700 bg-slate-900 flex items-center justify-center overflow-hidden shadow-md">
+                        <img src="https://cdn.discordapp.com/attachments/1538837684687208569/1539919119225323570/image.png?ex=6a8810f0&is=6a86bf70&hm=dd495478523ed60a6e1b5d5af1584fa9258c1721528ee0643ece371db856e733" alt="LSPD Logo" class="w-full h-full object-cover">
+                    </div>
+                    <div class="text-left">
+                        <div class="text-white font-extrabold text-sm tracking-wider">LSPD</div>
+                        <div class="text-slate-500 text-[10px] tracking-tight">COMMAND & STAFF COLLEGE</div>
+                    </div>
+                    <div class="bg-amber-400 text-slate-950 p-2 rounded-xl font-bold flex items-center justify-center shadow-lg">★</div>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 py-12 flex-grow flex flex-col items-center justify-center w-full">
-        <div class="bg-[#0c1019] border-2 border-slate-800/80 p-10 rounded-3xl shadow-2xl text-center max-w-2xl w-full">
-            <h1 class="text-4xl font-black text-amber-400 mb-4">LEADERSHIP COURSE</h1>
-            <p class="text-slate-400 text-sm leading-relaxed mb-6">مرحباً بك في أكاديمية شرطة لوس سانتوس. يرجى تسجيل الدخول للبدء بالخضوع للاختبار القيادي.</p>
-            
-            <div class="flex justify-center gap-4 mb-6">
-                <button onclick="handleStartTest()" class="bg-amber-400 hover:bg-amber-500 text-slate-950 px-8 py-3 rounded-xl font-black text-sm transition">بدء الاختبار الآن ←</button>
-                <button onclick="handleShowResult()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition">عرض نتيجتي 📊</button>
+    <main class="max-w-7xl mx-auto px-6 py-12 flex-grow grid grid-cols-1 lg:grid-cols-4 gap-8 w-full">
+        <div class="lg:col-span-3 space-y-12">
+            <!-- الواجهة الرئيسية -->
+            <div class="bg-[#0c1019] border-2 border-slate-800/80 p-10 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center gap-8">
+                <div class="w-36 h-36 md:w-48 md:h-48 shrink-0 rounded-full border-4 border-amber-400/20 bg-slate-900 p-2 shadow-2xl shadow-amber-500/10 overflow-hidden">
+                    <img src="https://cdn.discordapp.com/attachments/1538837684687208569/1539919119225323570/image.png?ex=6a8810f0&is=6a86bf70&hm=dd495478523ed60a6e1b5d5af1584fa9258c1721528ee0643ece371db856e733" alt="LSPD Logo" class="w-full h-full object-cover rounded-full">
+                </div>
+                
+                <div class="text-center md:text-right flex-grow">
+                    <div class="inline-block bg-slate-800 text-amber-400 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 border border-slate-700">
+                         Command Program
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-black text-amber-400 mb-6 tracking-tight">
+                        LEADERSHIP COURSE
+                    </h1>
+                    <p class="text-slate-400 text-base md:text-lg leading-relaxed mb-8">
+                        كلية القيادة والأركان لشرطة لوس سانتوس هي المؤسسة الأكاديمية الأولى لتأهيل الضباط. يلزم تسجيل الدخول بحساب مفعل لتأدية الاختبار.
+                    </p>
+                    <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                        <button onclick="handleStartTest()" class="bg-amber-400 hover:bg-amber-500 text-slate-950 px-8 py-3.5 rounded-xl font-black text-sm transition shadow-lg shadow-amber-500/10 flex items-center gap-2">
+                            <span>بدء الاختبار الآن</span>
+                            <span>←</span>
+                        </button>
+                        <button onclick="handleShowResult()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition border border-slate-700 flex items-center gap-2">
+                            <span>عرض نتيجتي 📊</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <!-- حاوية عرض النتيجة -->
-            <div id="resultStatusContainer" class="mt-4 hidden"></div>
+            <!-- قسم عرض نتيجة الاختبار مباشرة بالرئيسية -->
+            <div id="resultSection" class="hidden bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl shadow-2xl space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <h2 class="text-2xl font-black text-amber-400 flex items-center gap-2">
+                        <span>📊</span> نتيجة الاختبار الخاص بك
+                    </h2>
+                    <button onclick="hideResultSection()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-300">إغلاق ✕</button>
+                </div>
+
+                <!-- حالة الانتظار / قيد التصحيح -->
+                <div id="resultPendingView" class="hidden text-center py-8 space-y-3">
+                    <div class="text-amber-400 text-4xl">⏳</div>
+                    <h3 class="text-lg font-bold text-white">النتيجة قيد التصحيح والتقييم</h3>
+                    <p class="text-slate-400 text-xs max-w-md mx-auto">تم استلام إجاباتك بنجاح، وتعمل لجنة المشرفين حالياً على تقييمها. يرجى إعادة التحقق لاحقاً.</p>
+                </div>
+
+                <!-- حالة النتيجة المكتملة -->
+                <div id="resultDetailsView" class="hidden space-y-6 text-center">
+                    <div id="resBadge" class="inline-block px-4 py-1.5 rounded-full text-xs font-bold border"></div>
+
+                    <div>
+                        <h3 class="text-xl font-black text-white" id="resStudentName">--</h3>
+                        <p class="text-slate-400 text-xs mt-1" id="resExamInfo">--</p>
+                    </div>
+
+                    <div class="bg-[#141a27] border border-slate-800 p-6 rounded-2xl max-w-sm mx-auto space-y-1">
+                        <span class="text-xs text-slate-400 font-bold">النسبة المئوية:</span>
+                        <div class="text-5xl font-black" id="resScore">0%</div>
+                    </div>
+
+                    <div class="bg-[#141a27] border border-slate-800 p-4 rounded-xl text-right text-xs space-y-2 max-w-xl mx-auto">
+                        <p class="text-slate-300"><strong>القرار النهائي:</strong> <span id="resDecision" class="text-white">--</span></p>
+                        <p class="text-slate-300"><strong>ملاحظات لجنة المشرفين:</strong> <span id="resNotes" class="text-slate-400">--</span></p>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <aside class="space-y-6">
+            <div class="bg-[#0c1019] border-2 border-slate-800/80 p-6 rounded-3xl shadow-xl sticky top-24">
+                <h3 class="text-amber-400 font-black text-lg mb-4 pb-3 border-b border-slate-800 flex items-center gap-2">
+                    <span>🛡️</span> لوحة المشرفين
+                </h3>
+                <div id="supervisorsBoardList" class="space-y-3 text-sm">
+                    <div class="text-center text-slate-500 text-xs py-4">جاري تحميل قائمة المشرفين...</div>
+                </div>
+            </div>
+        </aside>
     </main>
+
+    <!-- Modal: تنبيه يتطلب تسجيل الدخول عند الضغط على بدء الاختبار -->
+    <div id="requireLoginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl w-full max-w-md text-center space-y-4 shadow-2xl relative">
+            <button onclick="closeRequireModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-lg">✕</button>
+            <div class="w-14 h-14 bg-amber-400/10 border border-amber-400/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+                🔒
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-white mb-2">تسجيل الدخول مطلوب</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">عذراً، يجب عليك تسجيل الدخول أولاً بحساب مختبر معتمد أو مشرف لتتمكن من خوض الاختبار القيادي أو رؤية النتيجة.</p>
+            </div>
+            <div class="flex gap-3 pt-3">
+                <button onclick="closeRequireModal(); openDiscordModal();" class="flex-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs py-3 rounded-xl transition shadow-lg">
+                    تسجيل الدخول الآن 🚀
+                </button>
+                <button onclick="closeRequireModal()" class="px-5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-3 rounded-xl transition">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal: تسجيل الدخول -->
     <div id="discordModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl w-full max-w-md shadow-2xl relative">
             <button onclick="closeDiscordModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-lg">✕</button>
             <div class="text-center mb-6">
+                <div class="inline-block bg-[#5865F2]/10 text-[#5865F2] p-3 rounded-2xl mb-3 border border-[#5865F2]/20 text-2xl font-bold">🔐</div>
                 <h3 class="text-xl font-black text-white">تسجيل دخول البوابة</h3>
+                <p class="text-slate-400 text-xs mt-1">المشرفين والمختبرين (الطلاب والضباط)</p>
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-2">اسم المستخدم:</label>
-                    <input type="text" id="adminUserInput" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200">
+                    <label class="block text-xs font-bold text-slate-400 mb-2">اسم المستخدم (Username):</label>
+                    <input type="text" id="adminUserInput" placeholder="اسم المستخدم..." class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400 transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-400 mb-2">كلمة المرور:</label>
-                    <input type="password" id="adminPassInput" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200">
+                    <input type="password" id="adminPassInput" placeholder="••••••••" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-amber-400 transition">
                 </div>
-                <button onclick="submitAdminLogin()" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-black py-3 rounded-xl text-sm transition">دخول البوابة 🚀</button>
+                <button onclick="submitAdminLogin()" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-black py-3 rounded-xl transition text-sm shadow-lg">دخول البوابة 🚀</button>
             </div>
         </div>
     </div>
+
+    <footer class="bg-[#0a0e16] border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        جميع الحقوق محفوظة © أكاديمية شرطة لوس سانتوس 2026
+    </footer>
 
     </div>
 
@@ -155,11 +290,73 @@
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
+        // ===== لوحة المشرفين (عرض عام لكل زوار الموقع) =====
+        const SUPERVISOR_ROLE_PRIORITY = ['admin', 'ldp', 'stp', 'stp_watch_commander', 'stp_supervisor', 'accounts_only'];
+        const SUPERVISOR_ROLE_LABELS = {
+            admin: '🛡️ مشرف عام (صلاحيات كاملة)',
+            ldp: 'LDP',
+            stp: 'STP',
+            stp_watch_commander: 'STP Watch Commander',
+            stp_supervisor: 'STP Super Visor',
+            accounts_only: 'Accounts (إدارة الحسابات)'
+        };
+
+        function getUserEffectiveRoles(user) {
+            if (!user || user.role === 'student') return [];
+            if (Array.isArray(user.roles) && user.roles.length) return user.roles;
+            if (user.role) return [user.role];
+            return [];
+        }
+
+        function loadSupervisorsBoard() {
+            let boardList = document.getElementById('supervisorsBoardList');
+            if (!boardList) return;
+
+            db.ref('lspd_users').on('value', snapshot => {
+                let data = snapshot.val() || {};
+                let supervisors = Object.values(data)
+                    .map(user => ({ user: user, roles: getUserEffectiveRoles(user) }))
+                    .filter(entry => entry.roles.length > 0);
+
+                if (!supervisors.length) {
+                    boardList.innerHTML = `<div class="text-center text-slate-500 text-xs py-4">لا يوجد مشرفين مسجلين حالياً.</div>`;
+                    return;
+                }
+
+                supervisors.sort((a, b) => {
+                    let rankOf = roles => Math.min(...roles.map(r => {
+                        let i = SUPERVISOR_ROLE_PRIORITY.indexOf(r);
+                        return i === -1 ? SUPERVISOR_ROLE_PRIORITY.length : i;
+                    }));
+                    return rankOf(a.roles) - rankOf(b.roles);
+                });
+
+                boardList.innerHTML = supervisors.map(entry => {
+                    let badges = entry.roles.map(r =>
+                        `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-400/10 border border-amber-400/20 text-amber-400">${SUPERVISOR_ROLE_LABELS[r] || r}</span>`
+                    ).join(' ');
+                    return `
+                        <div class="bg-[#141a27] p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between gap-3 flex-wrap">
+                            <div>
+                                <p class="font-bold text-white text-sm">${entry.user.name || 'غير معروف'}</p>
+                                <div class="flex flex-wrap gap-1.5 mt-1.5">${badges}</div>
+                            </div>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                        </div>
+                    `;
+                }).join('');
+            });
+        }
+
+        // ===== Registration Gate =====
         function checkRegistrationGate() {
             let reg = localStorage.getItem('registeredDiscordUser');
             if (reg) {
                 document.getElementById('registrationGate').classList.add('hidden');
                 document.getElementById('siteWrapper').classList.remove('hidden');
+            } else {
+                document.getElementById('registrationGate').classList.remove('hidden');
+                document.getElementById('siteWrapper').classList.add('hidden');
             }
         }
 
@@ -169,82 +366,116 @@
             let currentRank = document.getElementById('regCurrentRank').value;
             let nextRank = document.getElementById('regNextRank').value;
             let discordUser = document.getElementById('regDiscordUser').value.trim().toLowerCase();
+            let requiredCerts = Array.from(document.querySelectorAll('#regRequiredCertsGroup input:checked')).map(cb => cb.value);
+            let possessedCerts = Array.from(document.querySelectorAll('#regPossessedCertsGroup input:checked')).map(cb => cb.value);
 
-            if (!fullName || !unitCode || !discordUser) return alert("الرجاء تعبئة البيانات!");
+            if (!fullName || !unitCode || !currentRank || !nextRank || !discordUser) {
+                return alert("يرجى تعبئة جميع البيانات المطلوبة (الاسم، اليونت، الرتبة الحالية، الرتبة القادمة، يوزر الديسكورد)!");
+            }
 
-            db.ref('lspd_registrations/' + discordUser).set({ fullName, unitCode, currentRank, nextRank, discordUser }).then(() => {
+            let payload = {
+                fullName: fullName,
+                unitCode: unitCode,
+                currentRank: currentRank,
+                nextRank: nextRank,
+                requiredCerts: requiredCerts,
+                possessedCerts: possessedCerts,
+                discordUser: discordUser,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            db.ref('lspd_registrations/' + discordUser).set(payload).then(() => {
                 localStorage.setItem('registeredDiscordUser', discordUser);
                 checkRegistrationGate();
+            }).catch(err => {
+                alert("حدث خطأ أثناء حفظ البيانات: " + err.message);
             });
         }
 
         function handleStartTest() {
             let student = localStorage.getItem('studentUser');
             let isAdmin = localStorage.getItem('isAdminLoggedIn');
-            if (student || isAdmin === 'true') window.location.href = "tests.html";
-            else openDiscordModal();
+
+            if (student || isAdmin === 'true') {
+                window.location.href = "tests.html";
+            } else {
+                openRequireModal();
+            }
         }
 
+        // ===== دوال استعلام وعرض النتيجة =====
         function handleShowResult() {
-            let discordUser = localStorage.getItem('registeredDiscordUser');
-            let resultContainer = document.getElementById('resultStatusContainer');
-            if (!discordUser) return alert("الرجاء تسجيل البيانات أولاً!");
+            let student = localStorage.getItem('studentUser');
+            let isAdmin = localStorage.getItem('isAdminLoggedIn');
 
-            resultContainer.classList.remove('hidden');
-            resultContainer.innerHTML = `<div class="text-slate-400 text-sm">جاري جلب النتيجة...</div>`;
+            if (!student && isAdmin !== 'true') {
+                openRequireModal();
+                return;
+            }
 
+            const resultSection = document.getElementById('resultSection');
+            const resultPendingView = document.getElementById('resultPendingView');
+            const resultDetailsView = document.getElementById('resultDetailsView');
+
+            resultSection.classList.remove('hidden');
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+
+            // البحث عن الإجابة والنتيجة من Firebase
             db.ref('lspd_submissions').once('value').then(snapshot => {
-                let data = snapshot.val() || {};
-                let userSubmission = null;
+                const submissions = snapshot.val() || {};
+                
+                const userSubKey = Object.keys(submissions).reverse().find(key => 
+                    submissions[key] && submissions[key].accountUsername === student
+                );
 
-                Object.keys(data).forEach(key => {
-                    if (data[key].discordUser === discordUser) {
-                        userSubmission = data[key];
-                    }
-                });
-
-                if (!userSubmission) {
-                    resultContainer.innerHTML = `<div class="bg-slate-800/80 border border-slate-700 p-4 rounded-xl text-slate-300 text-sm">لم يتم العثور على أي نتائج مسجلة لهذا الحساب.</div>`;
+                if (!userSubKey) {
+                    resultPendingView.classList.remove('hidden');
+                    resultDetailsView.classList.add('hidden');
                     return;
                 }
 
-                if (userSubmission.status === 'فرصة ثانية') {
-                    resultContainer.innerHTML = `
-                        <div class="bg-amber-500/10 border border-amber-500/30 p-6 rounded-2xl text-center space-y-4">
-                            <div class="text-3xl">🔄</div>
-                            <h3 class="text-amber-400 font-black text-lg">تقرر إعطاؤك فرصة ثانية!</h3>
-                            <p class="text-slate-300 text-sm">تم تقييم اختبارك السابق وتقرر منحك فرصة جديدة لإعادة الاختبار. يمكنك البدء الآن.</p>
-                            <a href="tests.html" class="inline-block bg-amber-400 hover:bg-amber-500 text-slate-950 font-black px-6 py-2.5 rounded-xl text-sm transition shadow-lg">
-                                الانتقال للاختبار الآن 📝
-                            </a>
-                        </div>
-                    `;
-                } else if (userSubmission.status === 'مقبول') {
-                    resultContainer.innerHTML = `
-                        <div class="bg-emerald-500/10 border border-emerald-500/30 p-6 rounded-2xl text-center space-y-3">
-                            <div class="text-3xl">🎉</div>
-                            <h3 class="text-emerald-400 font-black text-lg">مبروك! تم قبولك (النسبة: ${userSubmission.score || 0}%)</h3>
-                            <p class="text-slate-300 text-sm">تهانينا، لقد تجاوزت الاختبار بنجاح.</p>
-                        </div>
-                    `;
-                } else if (userSubmission.status === 'مرفوض') {
-                    resultContainer.innerHTML = `
-                        <div class="bg-red-500/10 border border-red-500/30 p-6 rounded-2xl text-center space-y-3">
-                            <div class="text-3xl">❌</div>
-                            <h3 class="text-red-400 font-black text-lg">نعتذر منك، تم رفض الطلب (النسبة: ${userSubmission.score || 0}%)</h3>
-                            <p class="text-slate-300 text-sm">للأسف لم تتجاوز المعايير المطلوبة في الاختبار الحالي.</p>
-                        </div>
-                    `;
+                const subData = submissions[userSubKey];
+
+                if (subData.score === undefined && !subData.status) {
+                    resultPendingView.classList.remove('hidden');
+                    resultDetailsView.classList.add('hidden');
+                    return;
+                }
+
+                resultPendingView.classList.add('hidden');
+                resultDetailsView.classList.remove('hidden');
+
+                document.getElementById('resStudentName').innerText = subData.fullName || 'المختبر';
+                document.getElementById('resExamInfo').innerText = `الرتبة: ${subData.targetRank || '-'} | الاختبار: ${subData.certificateType || '-'}`;
+                document.getElementById('resScore').innerText = (subData.score || 0) + '%';
+                document.getElementById('resDecision').innerText = subData.status || 'تم التقييم';
+                document.getElementById('resNotes').innerText = subData.notes || 'لا يوجد ملاحظات إضافية.';
+
+                const badge = document.getElementById('resBadge');
+                const scoreDisplay = document.getElementById('resScore');
+
+                if (subData.status === 'مقبول' || (subData.score >= (subData.passScore || 70))) {
+                    badge.innerText = 'PASSED - ناجح';
+                    badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400';
+                    scoreDisplay.className = 'text-5xl font-black text-emerald-400';
                 } else {
-                    resultContainer.innerHTML = `
-                        <div class="bg-blue-500/10 border border-blue-500/30 p-6 rounded-2xl text-center space-y-3">
-                            <div class="text-3xl">⏳</div>
-                            <h3 class="text-blue-400 font-black text-lg">اختبارك قيد المراجعة</h3>
-                            <p class="text-slate-300 text-sm">طلبك حالياً تحت تصحيح وتقييم لجنة الاختبارات.</p>
-                        </div>
-                    `;
+                    badge.innerText = 'FAILED - لم يتجاوز الاختبار';
+                    badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-red-500/40 bg-red-500/10 text-red-400';
+                    scoreDisplay.className = 'text-5xl font-black text-red-400';
                 }
             });
+        }
+
+        function hideResultSection() {
+            document.getElementById('resultSection').classList.add('hidden');
+        }
+
+        function openRequireModal() {
+            document.getElementById('requireLoginModal').classList.remove('hidden');
+        }
+
+        function closeRequireModal() {
+            document.getElementById('requireLoginModal').classList.add('hidden');
         }
 
         function openDiscordModal() { document.getElementById('discordModal').classList.remove('hidden'); }
@@ -254,9 +485,14 @@
             let user = document.getElementById('adminUserInput').value.trim().toLowerCase();
             let pass = document.getElementById('adminPassInput').value.trim();
 
+            if (!user || !pass) return alert("يرجى ملء جميع الحقول!");
+
             if ((user === "m5" && pass === "M113355m") || (user === "admin" && pass === "F!GtqAX!GZ8VU/M")) {
                 localStorage.setItem('isAdminLoggedIn', 'true');
                 localStorage.setItem('adminName', user);
+                localStorage.setItem('adminRole', 'admin');
+                localStorage.setItem('adminRoles', JSON.stringify(['admin']));
+                alert("مرحباً بك كأدمن رئيسي.");
                 window.location.href = "admin.html";
                 return;
             }
@@ -264,43 +500,59 @@
             db.ref('lspd_users/' + user).once('value').then(snapshot => {
                 let data = snapshot.val();
                 if (data && data.password === pass) {
-                    if (data.role === 'admin') {
+                    if (data.role !== 'student') {
+                        let effectiveRoles = (Array.isArray(data.roles) && data.roles.length) ? data.roles : [data.role];
                         localStorage.setItem('isAdminLoggedIn', 'true');
                         localStorage.setItem('adminName', data.name);
+                        localStorage.setItem('adminRole', effectiveRoles[0]);
+                        localStorage.setItem('adminRoles', JSON.stringify(effectiveRoles));
+                        alert("مرحباً بك " + data.name + "، تم توجيهك للوحة التحكم.");
                         window.location.href = "admin.html";
                     } else {
                         localStorage.setItem('studentUser', user);
                         localStorage.setItem('studentName', data.name);
-                        alert("تم تسجيل الدخول بنجاح.");
+                        alert("مرحباً بك " + data.name + "، تم تسجيل الدخول بنجاح.");
                         closeDiscordModal();
                         updateUI();
                     }
-                } else alert("بيانات الدخول خاطئة!");
+                } else {
+                    alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+                }
             });
         }
 
         function logoutUser() {
-            localStorage.clear();
+            localStorage.removeItem('isAdminLoggedIn');
+            localStorage.removeItem('adminName');
+            localStorage.removeItem('adminRole');
+            localStorage.removeItem('adminRoles');
+            localStorage.removeItem('studentUser');
+            localStorage.removeItem('studentName');
+            hideResultSection();
             updateUI();
+            alert("تم تسجيل الخروج.");
         }
 
         function updateUI() {
-            if (localStorage.getItem('isAdminLoggedIn') === 'true' || localStorage.getItem('studentUser')) {
+            if(localStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('adminNavLink').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                document.getElementById('loginBtn').classList.add('hidden');
+            } else if(localStorage.getItem('studentUser')) {
+                document.getElementById('adminNavLink').classList.add('hidden');
                 document.getElementById('logoutBtn').classList.remove('hidden');
                 document.getElementById('loginBtn').classList.add('hidden');
             } else {
+                document.getElementById('adminNavLink').classList.add('hidden');
                 document.getElementById('logoutBtn').classList.add('hidden');
                 document.getElementById('loginBtn').classList.remove('hidden');
-            }
-
-            if (localStorage.getItem('isAdminLoggedIn') === 'true') {
-                document.getElementById('adminNavLink').classList.remove('hidden');
             }
         }
 
         window.onload = function() {
             checkRegistrationGate();
             updateUI();
+            loadSupervisorsBoard();
         };
     </script>
 </body>
