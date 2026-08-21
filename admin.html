@@ -874,7 +874,7 @@
                                 <input type="number" id="score_input_${subId}" value="${item.score !== undefined ? item.score : ''}" placeholder="النسبة %" class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2 text-xs text-white">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 mb-1">ملاحظات المشرف:</label>
+                                <label class="block text-xs font-bold text-slate-400 mb-1">القرار الصادر بحقك:</label>
                                 <input type="text" id="notes_input_${subId}" value="${item.notes || ''}" placeholder="أضف ملاحظات المراجع..." class="w-full bg-[#0c1019] border border-slate-700 rounded-xl px-4 py-2 text-xs text-white">
                             </div>
                         </div>
@@ -1156,13 +1156,26 @@
                         <td class="p-3 text-slate-400">${r.discordUser || 'N/A'}</td>
                         <td class="p-3">${rolesBadge}</td>
                         <td class="p-3 text-center">
-                            <button onclick="openRegistrationRolesModal('${id}')" class="assign-registration-role-btn bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 border border-emerald-500/20 px-2.5 py-1 rounded-lg transition text-xs font-bold">تعيين صلاحية 🏷️</button>
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="openRegistrationRolesModal('${id}')" class="assign-registration-role-btn bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 border border-emerald-500/20 px-2.5 py-1 rounded-lg transition text-xs font-bold">تعيين صلاحية 🏷️</button>
+                                <button onclick="deleteRegistration('${id}')" title="حذف السجل" class="bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 w-6 h-6 flex items-center justify-center rounded-lg transition text-xs font-bold">✕</button>
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
                 applySupervisorManagementRestrictions();
             });
+        }
+
+        function deleteRegistration(id) {
+            if (confirm("هل أنت متأكد من حذف بيانات هذا الشخص بشكل نهائي؟")) {
+                db.ref('lspd_registrations/' + id).remove().then(() => {
+                    alert("تم حذف السجل بنجاح!");
+                }).catch(err => {
+                    alert("حدث خطأ أثناء الحذف: " + err.message);
+                });
+            }
         }
 
         function openEditModal(username) {
