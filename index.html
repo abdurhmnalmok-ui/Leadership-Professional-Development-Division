@@ -454,10 +454,14 @@
                 const badge = document.getElementById('resBadge');
                 const scoreDisplay = document.getElementById('resScore');
 
-                if (subData.status === 'مقبول' || (subData.score >= (subData.passScore || 70))) {
+                if (subData.status === 'مقبول' || (subData.status !== 'فرصة ثانية' && subData.score >= (subData.passScore || 70))) {
                     badge.innerText = 'PASSED - ناجح';
                     badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400';
                     scoreDisplay.className = 'text-5xl font-black text-emerald-400';
+                } else if (subData.status === 'فرصة ثانية') {
+                    badge.innerText = 'SECOND CHANCE - فرصة ثانية';
+                    badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-amber-500/40 bg-amber-500/10 text-amber-400';
+                    scoreDisplay.className = 'text-5xl font-black text-amber-400';
                 } else {
                     badge.innerText = 'FAILED - لم يتجاوز الاختبار';
                     badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-red-500/40 bg-red-500/10 text-red-400';
