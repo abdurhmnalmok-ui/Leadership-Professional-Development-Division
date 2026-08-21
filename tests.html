@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الاكاديمية الشرطية - اختبار الرتب العسكرية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .tag-card.active { border-color: #3B82F6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); transform: scale(0.98); }
+        .secure-portal-bg { background-color: #0b1120; }
+        .question-box-bg { background-color: #0f172a; }
+    </style>
+</head>
+<body class="bg-[#080B12] text-slate-200 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <header class="border-b border-slate-800/50 bg-[#0a0e16] sticky top-0 z-50">
+        <div class="max-w-[96rem] mx-auto px-6 py-2.5 flex items-center justify-between">
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <a href="index.html" class="text-slate-400 hover:text-white text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5"><span>🏠</span> الرئيسية</a>
+                <a href="tests.html" class="text-blue-400 text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-blue-900/30 flex items-center gap-1.5"><span>📝</span> الاختبار</a>
+            </div>
+            <div class="text-white font-black text-sm">أكاديمية شرطة لوس سانتوس</div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-6 w-full max-w-5xl mx-auto">
+        <!-- Blocked View -->
+        <div id="blockedView" class="hidden bg-[#0c1019] border-2 border-red-500/30 p-8 rounded-3xl shadow-2xl w-full max-w-2xl text-center space-y-4">
+            <div class="text-red-400 text-4xl">🛑</div>
+            <h1 class="text-xl font-black text-white">لديك طلب اختبار سابق قيد المراجعة</h1>
+            <p class="text-slate-400 text-sm" id="blockReasonText">تم اكتشاف طلب مرتبط بحسابك لا يزال قيد التقييم. لا يمكنك إجراء اختبار جديد حتى يتم البت فيه.</p>
+            <button onclick="window.location.reload()" class="inline-block bg-slate-800 hover:bg-slate-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition mt-4">تحديث الصفحة</button>
+        </div>
+
+        <!-- Login Required View -->
+        <div id="loginRequiredView" class="hidden bg-[#0c1019] border-2 border-amber-500/30 p-8 rounded-3xl shadow-2xl w-full max-w-2xl text-center space-y-4">
+            <div class="text-amber-400 text-4xl">🔒</div>
+            <h1 class="text-xl font-black text-white">تسجيل الدخول مطلوب</h1>
+            <p class="text-slate-400 text-sm">لازم تسجل دخول بالحساب اللي أعطاك إياه المشرف أولاً قبل ما تقدر تبدأ الاختبار.</p>
+            <a href="index.html" class="inline-block bg-amber-400 hover:bg-amber-500 text-slate-950 font-black px-6 py-2.5 rounded-xl text-sm transition mt-4">الذهاب لتسجيل الدخول 🔑</a>
+        </div>
+
+        <!-- Step 1: User Data Input -->
+        <div id="step1" class="hidden bg-[#0c1019] border border-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-3xl space-y-6">
+            <div class="text-center border-b border-slate-800 pb-4">
+                <h1 class="text-2xl font-black text-blue-500">بوابة الاختبارات العسكرية التكتيكية</h1>
+                <p class="text-slate-400 text-xs mt-1">يُرجى إدخال بياناتك العسكرية لبدء جلسة التقييم</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الاسم العسكري:</label>
+                    <input type="text" id="fullName" placeholder="اكتب اسمك هنا..." class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1.5">رقم اليونت (Call Sign):</label>
+                        <input type="text" id="callSign" placeholder="مثال: A-12" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1.5">أيدي ديسكورد (مهم جداً):</label>
+                        <input type="text" id="discordUser" placeholder="مثال: username" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الرتبة المستهدفة:</label>
+                    <select id="targetRank" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+                        <option value="Officer 1">Officer 1</option>
+                        <option value="Officer 2">Officer 2</option>
+                        <option value="Officer 3">Officer 3</option>
+                        <option value="Senior Officer">Senior Officer</option>
+                        <option value="Sergeant">Sergeant</option>
+                        <option value="First Sergeant">First Sergeant</option>
+                        <option value="Staff Sergeant">Staff Sergeant</option>
+                        <option value="Lieutenant">Lieutenant</option>
+                    </select>
+                </div>
+                <!-- إضافة الشهادة المقدم عليها -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1.5">الشهادة المقدم عليها:</label>
+                    <select id="certificateType" class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-amber-400 font-bold focus:outline-none focus:border-blue-500">
+                        <option value="" disabled selected>اختر الشهادة...</option>
+                        <option value="Certified Lead">Certified Lead</option>
+                        <option value="Watch Commander">Watch Commander</option>
+                        <option value="Supervisor">Supervisor</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="startExam()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 rounded-xl transition text-sm shadow-lg">
+                متابعة 🛡️
+            </button>
+        </div>
+
+        <!-- Pledge View -->
+        <div id="pledgeView" class="hidden bg-[#0c1019] border border-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-3xl space-y-6">
+            <div class="text-center border-b border-slate-800 pb-4">
+                <h1 class="text-2xl font-black text-red-500">إقرار وتعهد بالسرية</h1>
+                <p class="text-slate-400 text-xs mt-1">يجب كتابة التعهد أدناه يدوياً للموافقة على الشروط والبدء</p>
+            </div>
+
+            <div class="bg-red-500/10 border border-red-500/30 p-5 rounded-xl text-center">
+                <p class="text-red-400 text-[15px] font-bold leading-loose select-none" id="pledgeSourceText">أقر أنا المختبر أدناه بتعهدي التام بالمحافظة على سرية الاختبار، وعدم تصوير أو نسخ أو تسريب أي من أسئلته أو إجاباته بأي وسيلة كانت. وفي حال المخالفة، أتحمل كامل المسؤولية القانونية التي يترتب عليها إلغاء نتيجتي وحرماني من الاختبار.</p>
+            </div>
+
+            <div>
+                <textarea id="pledgeInput" rows="4" placeholder="اكتب التعهد هنا حرفياً كما هو موضح بالأعلى..." class="w-full bg-[#141a27] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-red-500 resize-none"></textarea>
+                <p id="pledgeError" class="text-red-500 text-xs mt-2 hidden font-bold">⚠️ النص غير مطابق، يرجى كتابة التعهد بشكل صحيح تماماً.</p>
+            </div>
+
+            <button onclick="confirmPledge()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-3.5 rounded-xl transition text-sm shadow-lg">
+                تأكيد التعهد وبدء الاختبار ⏱️
+            </button>
+        </div>
+
+        <!-- Step 2: Theory Exam -->
+        <div id="step2" class="hidden secure-portal-bg border border-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-4xl flex-col" dir="ltr">
+            <div class="flex justify-between items-start mb-10 border-b border-slate-800/50 pb-6">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600/20 p-2 rounded-lg text-blue-500">🛡️</div>
+                    <div>
+                        <h1 class="text-xl font-black text-white tracking-wide">PHASE 01: WRITTEN EXAMINATION</h1>
+                        <p class="text-slate-500 text-[10px] font-bold tracking-widest uppercase mt-0.5">Command College Secure Portal</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <div class="flex justify-between text-[11px] text-slate-400 font-bold mb-2 uppercase tracking-widest">
+                    <span>Progress</span>
+                    <span id="progressText">1/50</span>
+                </div>
+                <div class="w-full bg-[#111827] h-1.5 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-blue-600 h-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="question-box-bg border border-slate-800/80 rounded-xl p-8 relative">
+                <div class="flex justify-between items-center mb-8">
+                    <div class="border border-slate-700 bg-[#0b1120] text-red-400 text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-2">
+                        ⏱ <span id="timerDisplay">01:00</span>
+                    </div>
+                    <div class="text-blue-500 text-xs font-bold tracking-widest uppercase" id="questionNumberText">
+                        QUESTION 01
+                    </div>
+                </div>
+
+                <div dir="rtl" class="mb-8 min-h-[60px]">
+                    <h2 class="text-lg md:text-xl font-bold text-white leading-relaxed" id="questionText">جاري تحميل السؤال...</h2>
+                </div>
+
+                <div id="optionsContainer" class="space-y-3" dir="rtl"></div>
+
+                <div class="mt-8 border-t border-slate-800 pt-6">
+                    <button onclick="manualNextQuestion()" class="bg-[#1e293b] hover:bg-[#334155] text-white font-bold py-2.5 px-6 rounded border border-slate-700 transition text-sm flex items-center gap-2 tracking-wide">
+                        CONFIRM ✓
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Practical MDT Exam -->
+        <div id="step3" class="hidden w-full h-[85vh] bg-[#111827] rounded-xl overflow-hidden border border-slate-800 shadow-2xl flex-col font-sans">
+            <div class="bg-[#1e293b] border-b border-slate-700 h-16 flex items-center justify-between px-6">
+                <div class="flex items-center gap-4 w-1/3">
+                    <div class="bg-[#334155] rounded-lg p-2 text-white font-bold text-sm">قضية جديدة</div>
+                </div>
+                <div class="flex-1 max-w-md mx-4">
+                    <div class="relative">
+                        <input type="text" placeholder="البحث..." class="w-full bg-[#0f172a] border border-slate-600 rounded-full px-4 py-1.5 text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-3 w-1/3">
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-white" id="mdtOfficerNameDisplay">LSPD Officer</div>
+                        <div class="text-xs text-green-400">متصل (الاختبار العملي)</div>
+                    </div>
+                    <div class="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold border-2 border-slate-600">👮</div>
+                </div>
+            </div>
+
+            <div class="flex flex-1 overflow-hidden">
+                <div class="w-64 bg-[#1e293b] border-l border-slate-700 p-4 flex flex-col gap-3 overflow-y-auto">
+                    <h3 class="text-slate-400 font-black text-sm text-center mb-2">الأزرار</h3>
+                    <button onclick="openModal('violationsModal')" class="bg-[#0f172a] border border-slate-600 hover:border-blue-500 hover:bg-[#1e293b] text-white p-3 rounded-lg flex justify-between items-center transition">
+                        <span class="text-slate-400">&lt;</span> <span class="font-bold text-sm">تحديد المخالفات</span>
+                    </button>
+                    <button onclick="openModal('textModal', 'offender')" class="bg-[#0f172a] border border-slate-600 hover:border-blue-500 hover:bg-[#1e293b] text-white p-3 rounded-lg flex justify-between items-center transition">
+                        <span class="text-slate-400">&lt;</span> <span class="font-bold text-sm">تحديد المجرمين</span>
+                    </button>
+                    <button onclick="openModal('textModal', 'officers')" class="bg-[#0f172a] border border-slate-600 hover:border-blue-500 hover:bg-[#1e293b] text-white p-3 rounded-lg flex justify-between items-center transition">
+                        <span class="text-slate-400">&lt;</span> <span class="font-bold text-sm">العساكر المشاركين</span>
+                    </button>
+                    <div class="mt-auto pt-6 space-y-2">
+                        <div class="bg-[#0f172a] border border-slate-700 p-3 rounded-lg">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[11px] text-slate-400">إجمالي السجن:</span>
+                                <span id="mdtTotalMonths" class="text-red-400 font-black text-sm">0 شهر</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[11px] text-slate-400">إجمالي الغرامات:</span>
+                                <span id="mdtTotalFines" class="text-emerald-400 font-black text-sm">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 p-6 flex flex-col gap-4 overflow-y-auto bg-[#0f172a]">
+                    <h2 class="text-white font-black text-lg border-b border-slate-700 pb-2">تفاصيل القضية</h2>
+                    <div class="flex gap-4">
+                        <div class="flex-1 space-y-1">
+                            <label class="text-slate-400 text-xs font-bold">نوع القضية <span class="text-red-500">*</span></label>
+                            <select id="mdtCaseType" class="w-full bg-[#1e293b] border border-slate-600 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                                <option value="جنائية">جنائية</option>
+                                <option value="مرورية">مرورية</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 space-y-1">
+                            <label class="text-slate-400 text-xs font-bold">عنوان القضية <span class="text-red-500">*</span></label>
+                            <input type="text" id="mdtCaseTitle" class="w-full bg-[#1e293b] border border-slate-600 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-blue-500" placeholder="اكتب العنوان...">
+                        </div>
+                    </div>
+                    <div class="flex-1 flex flex-col min-h-[300px] border border-slate-600 rounded-lg overflow-hidden bg-[#1e293b]">
+                        <textarea id="mdtCaseDetails" class="w-full flex-1 bg-transparent p-4 text-sm text-slate-200 resize-none outline-none leading-relaxed" placeholder="اكتب تفاصيل الحادثة، أقوال الشهود..."></textarea>
+                    </div>
+                    <div class="flex items-center gap-8 bg-[#1e293b] p-3 rounded-lg border border-slate-700 w-fit mt-2">
+                        <label class="flex items-center gap-2 text-xs font-bold cursor-pointer">
+                            <input type="checkbox" id="mdtBargain" class="w-4 h-4 accent-blue-600 bg-[#0f172a]"> المساومة
+                        </label>
+                        <label class="flex items-center gap-2 text-xs font-bold cursor-pointer">
+                            <input type="checkbox" id="mdtClosed" class="w-4 h-4 accent-blue-600 bg-[#0f172a]" checked> القضية مغلقة
+                        </label>
+                    </div>
+                    <div class="bg-[#1e293b] border border-slate-600 rounded-lg p-4 flex justify-between items-center mt-2">
+                        <span class="text-slate-400 text-xs">يرجى التأكد من اختيار المخالفات وكتابة التقرير بشكل كامل.</span>
+                        <button onclick="submitFinalExam()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg transition shadow-lg text-sm">
+                            حفظ وإرسال التقرير 📥
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Submission Success -->
+        <div id="step4" class="hidden bg-[#0c1019] border border-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-4xl text-center space-y-6">
+            <div class="text-4xl">🎉</div>
+            <h1 class="text-2xl font-black text-white">تم إرسال اختبارك بنجاح!</h1>
+            <p class="text-slate-400 text-sm">أنت الآن في قائمة الانتظار، بانتظار تصحيح المسؤول للإجابات النظرية والتقرير العملي.</p>
+            <button onclick="window.location.reload()" class="inline-block bg-slate-800 hover:bg-slate-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">العودة للرئيسية</button>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="modalOverlay" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex justify-center items-center">
+        <div id="violationsModal" class="hidden bg-[#0f172a] border border-slate-600 rounded-xl w-full max-w-4xl h-[70vh] flex-col shadow-2xl overflow-hidden">
+            <div class="bg-[#1e293b] p-4 flex justify-between items-center border-b border-slate-700">
+                <h3 class="text-white font-bold text-lg">⚖️ تحديد المخالفات</h3>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-red-400 font-bold text-2xl">&times;</button>
+            </div>
+            <div class="p-4 overflow-y-auto grid grid-cols-2 md:grid-cols-4 gap-3 content-start flex-1" id="tagsGrid"></div>
+            <div class="bg-[#1e293b] p-4 border-t border-slate-700 text-center">
+                <button onclick="closeModals()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-bold text-sm">تأكيد واغلاق</button>
+            </div>
+        </div>
+        <div id="textModal" class="hidden bg-[#1e293b] border border-slate-600 rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+                <h3 class="text-white font-bold" id="modalTextTitle">إضافة</h3>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-red-400 font-bold text-xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-xs text-slate-400">الرجاء كتابة الأسماء مفصولة بفاصلة</p>
+                <input type="text" id="modalTextInput" class="w-full bg-[#0f172a] border border-slate-600 rounded-lg p-3 text-sm text-white outline-none focus:border-blue-500">
+                <button onclick="saveTextModal()" class="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-lg text-white text-sm font-bold transition">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBaoWelTtGQjUBTSDjOIc35DrYap-lyH6c",
+            authDomain: "leadership-professional.firebaseapp.com",
+            databaseURL: "https://leadership-professional-default-rtdb.firebaseio.com",
+            projectId: "leadership-professional",
+            storageBucket: "leadership-professional.firebasestorage.app",
+            messagingSenderId: "620428076068",
+            appId: "1:620428076068:web:f4f0aa97b7282830d1a4b1"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        let currentExamData = { fullName: '', callSign: '', discordUser: '', targetRank: '', certificateType: '', questionsList: [], theoryAnswersHTML: '' };
+        let userAnswers = [];
+        let currentQuestionIndex = 0;
+        let secondsPerQuestion = 60;
+        let timerInterval = null;
+        let studentAccountUser = null; // اسم المستخدم لحساب المختبر المسجل دخوله (يُستخدم لربط اختبار واحد بكل حساب)
+
+        // 🔒 لازم المختبر يكون مسجل دخول بحساب أنشأه المشرف قبل ما يقدر يفتح صفحة الاختبار
+        document.addEventListener('DOMContentLoaded', () => {
+            studentAccountUser = localStorage.getItem('studentUser');
+            if (!studentAccountUser) {
+                document.getElementById('loginRequiredView').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('step1').classList.remove('hidden');
+        });
+
+        let mdtData = { offender: 'لم يحدد', officers: 'لم يحدد', totalMonths: 0, totalFine: 0, tagsHTML: '' };
+        let activeModalType = '';
+
+        const EXPECTED_PLEDGE = "أقر أنا المختبر أدناه بتعهدي التام بالمحافظة على سرية الاختبار، وعدم تصوير أو نسخ أو تسريب أي من أسئلته أو إجاباته بأي وسيلة كانت. وفي حال المخالفة، أتحمل كامل المسؤولية القانونية التي يترتب عليها إلغاء نتيجتي وحرماني من الاختبار.";
+
+        const policeCharges = [
+            { id: 1, name: "عدم حمل رخصة قيادة", type: "green", fine: 1000, months: 0 },
+            { id: 2, name: "القيادة بتهور", type: "green", fine: 3000, months: 0 },
+            { id: 4, name: "القيادة تحت تأثير المسكرات", type: "green", fine: 5000, months: 5 },
+            { id: 5, name: "عدم الامتثال للاستيقاف", type: "orange", fine: 4000, months: 5 },
+            { id: 6, name: "الهروب من الشرطة", type: "orange", fine: 6000, months: 10 },
+            { id: 8, name: "مقاومة اعتقال", type: "orange", fine: 5000, months: 10 },
+            { id: 9, name: "سرقة متجر", type: "red", fine: 15000, months: 20 },
+            { id: 12, name: "شروع في قتل عسكري", type: "red", fine: 40000, months: 60 }
+        ];
+        let selectedCharges = new Set();
+
+        function startExam() {
+            if (!studentAccountUser) {
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('loginRequiredView').classList.remove('hidden');
+                return;
+            }
+
+            let fullName = document.getElementById('fullName').value.trim();
+            let callSign = document.getElementById('callSign').value.trim();
+            let discordUser = document.getElementById('discordUser').value.trim();
+            let targetRank = document.getElementById('targetRank').value;
+            let certificateType = document.getElementById('certificateType').value;
+
+            if (!fullName || !callSign || !discordUser || !certificateType) {
+                return alert("الرجاء تعبئة جميع البيانات بما فيها اختيار الشهادة!");
+            }
+
+            db.ref('lspd_submissions').once('value').then(snapshot => {
+                let submissions = snapshot.val() || {};
+                // 🔒 كل حساب له اختبار واحد فقط بنفس الوقت: ممنوع حساب يقدّم اختبار جديد وله طلب سابق لسا قيد المراجعة
+                // (لو المشرف قبل أو رفض أو أعطى فرصة ثانية، تنفتح له إمكانية تقديم اختبار جديد تلقائياً)
+                let activeSub = Object.values(submissions).find(s => 
+                    s && s.accountUsername === studentAccountUser && !s.status
+                );
+
+                if (activeSub) {
+                    document.getElementById('step1').classList.add('hidden');
+                    document.getElementById('blockedView').classList.remove('hidden');
+                    return;
+                }
+
+                db.ref('lspd_questions/' + targetRank + '/' + certificateType).once('value').then(qSnapshot => {
+                    let savedData = qSnapshot.val();
+                    if (!savedData || !savedData.questions || savedData.questions.length === 0) {
+                        return alert("عذراً، لم يقم المسؤول بإضافة أسئلة لهذه الرتبة والشهادة بعد.");
+                    }
+
+                    let timerMinutes = savedData.timer || savedData.timerMinutes || 5;
+                    secondsPerQuestion = Math.max(15, Math.floor((timerMinutes * 60) / savedData.questions.length));
+
+                    currentExamData = { fullName, callSign, discordUser, targetRank, certificateType, questionsList: savedData.questions };
+                    userAnswers = new Array(savedData.questions.length).fill(null);
+
+                    document.getElementById('mdtOfficerNameDisplay').innerText = callSign + ' | ' + fullName;
+                    document.getElementById('step1').classList.add('hidden');
+                    document.getElementById('pledgeView').classList.remove('hidden');
+                });
+            });
+        }
+
+        function confirmPledge() {
+            let userInput = document.getElementById('pledgeInput').value;
+            let cleanInput = userInput.replace(/\s+/g, ' ').trim();
+            let cleanExpected = EXPECTED_PLEDGE.replace(/\s+/g, ' ').trim();
+
+            if (cleanInput !== cleanExpected) {
+                document.getElementById('pledgeError').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('pledgeView').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            document.getElementById('step2').classList.add('flex');
+
+            currentQuestionIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            let q = currentExamData.questionsList[currentQuestionIndex];
+            let total = currentExamData.questionsList.length;
+
+            document.getElementById('progressText').innerText = `${currentQuestionIndex + 1}/${total}`;
+            document.getElementById('progressBar').style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
+            document.getElementById('questionNumberText').innerText = `QUESTION ${(currentQuestionIndex + 1).toString().padStart(2, '0')}`;
+            document.getElementById('questionText').innerText = q.text || q.question;
+
+            let container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            let isMultiple = (q.type === 'mcq' || (q.options && q.options.length > 0 && q.options.some(o => o)));
+
+            if (isMultiple && q.options) {
+                q.options.forEach((opt) => {
+                    if (opt) {
+                        let isChecked = userAnswers[currentQuestionIndex] === opt ? 'checked' : '';
+                        let activeClass = isChecked ? 'border-slate-500 bg-slate-800/50' : 'border-slate-800 bg-[#0a0f1c]';
+
+                        container.innerHTML += `
+                            <label class="flex items-center gap-4 ${activeClass} border p-4 rounded-lg cursor-pointer hover:border-slate-600 transition" onclick="selectOption(this)">
+                                <input type="radio" name="current_q" value="${opt}" class="w-4 h-4 accent-slate-300" ${isChecked} onchange="updateOptionStyles()">
+                                <span class="text-sm text-slate-300 font-semibold">${opt}</span>
+                            </label>
+                        `;
+                    }
+                });
+            } else {
+                let currentVal = userAnswers[currentQuestionIndex] || '';
+                container.innerHTML = `<textarea id="current_text_ans" rows="4" placeholder="اكتب إجابتك هنا..." class="w-full bg-[#0a0f1c] border border-slate-700 rounded-xl p-4 text-sm text-slate-200 focus:outline-none focus:border-slate-500 resize-none">${currentVal}</textarea>`;
+            }
+
+            startQuestionTimer();
+        }
+
+        function updateOptionStyles() {
+            let labels = document.querySelectorAll('#optionsContainer label');
+            labels.forEach(label => {
+                let radio = label.querySelector('input[type="radio"]');
+                if (radio.checked) {
+                    label.classList.remove('border-slate-800', 'bg-[#0a0f1c]');
+                    label.classList.add('border-slate-500', 'bg-slate-800/50');
+                } else {
+                    label.classList.remove('border-slate-500', 'bg-slate-800/50');
+                    label.classList.add('border-slate-800', 'bg-[#0a0f1c]');
+                }
+            });
+        }
+
+        function selectOption(labelElement) {
+            let radio = labelElement.querySelector('input[type="radio"]');
+            radio.checked = true;
+            updateOptionStyles();
+        }
+
+        function startQuestionTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            let timer = secondsPerQuestion;
+            let display = document.getElementById('timerDisplay');
+            
+            let m = parseInt(timer / 60, 10);
+            let s = parseInt(timer % 60, 10);
+            display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+
+            timerInterval = setInterval(() => {
+                timer--;
+                m = parseInt(timer / 60, 10);
+                s = parseInt(timer % 60, 10);
+                display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+
+                if (timer <= 10) display.parentElement.classList.add('text-red-500');
+                else display.parentElement.classList.remove('text-red-500');
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    autoSkipQuestion();
+                }
+            }, 1000);
+        }
+
+        function autoSkipQuestion() {
+            let q = currentExamData.questionsList[currentQuestionIndex];
+            let isMultiple = (q.type === 'mcq' || (q.options && q.options.length > 0 && q.options.some(o => o)));
+
+            if (isMultiple) {
+                let sel = document.querySelector('input[name="current_q"]:checked');
+                userAnswers[currentQuestionIndex] = sel ? sel.value : 'انتهى الوقت ولم يتم الإجابة';
+            } else {
+                let inp = document.getElementById('current_text_ans');
+                let val = inp ? inp.value.trim() : '';
+                userAnswers[currentQuestionIndex] = val ? val : 'انتهى الوقت ولم يتم الإجابة';
+            }
+            moveToNext();
+        }
+
+        function manualNextQuestion() {
+            let q = currentExamData.questionsList[currentQuestionIndex];
+            let isMultiple = (q.type === 'mcq' || (q.options && q.options.length > 0 && q.options.some(o => o)));
+
+            if (isMultiple) {
+                let sel = document.querySelector('input[name="current_q"]:checked');
+                if (!sel) return alert("الرجاء اختيار إجابة قبل المتابعة!");
+                userAnswers[currentQuestionIndex] = sel.value;
+            } else {
+                let inp = document.getElementById('current_text_ans');
+                let val = inp ? inp.value.trim() : '';
+                if (!val) return alert("الرجاء كتابة إجابة قبل المتابعة!");
+                userAnswers[currentQuestionIndex] = val;
+            }
+            moveToNext();
+        }
+
+        function moveToNext() {
+            if (timerInterval) clearInterval(timerInterval);
+
+            if (currentQuestionIndex < currentExamData.questionsList.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                submitTheoryExam();
+            }
+        }
+
+        function submitTheoryExam() {
+            if (timerInterval) clearInterval(timerInterval);
+            let html = '';
+            currentExamData.questionsList.forEach((q, index) => {
+                let userAns = userAnswers[index] || 'لم يتم الإجابة';
+                let correctAnsText = q.options && q.options[q.correctOption] ? q.options[q.correctOption] : 'مراجعة يدوية';
+                let isTimeOut = userAns === 'انتهى الوقت ولم يتم الإجابة';
+                let ansColor = isTimeOut ? 'text-red-400' : 'text-blue-400';
+
+                html += `<div class="mb-3 pb-3 border-b border-slate-800 last:border-0">
+                    <p class="font-bold text-white">• س ${index+1}: ${q.text || q.question}</p>
+                    <p class="text-slate-400 text-xs mt-1">إجابة المتقدم: <span class="${ansColor} font-semibold">${userAns}</span></p>
+                    <p class="text-emerald-400 text-xs mt-1">✓ المعتمدة: <span class="font-semibold">${correctAnsText}</span></p>
+                </div>`;
+            });
+            currentExamData.theoryAnswersHTML = html;
+            
+            document.getElementById('step2').classList.remove('flex');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            document.getElementById('step3').classList.add('flex');
+            initTagsGrid();
+        }
+
+        function initTagsGrid() {
+            let grid = document.getElementById('tagsGrid');
+            grid.innerHTML = '';
+            policeCharges.forEach(c => {
+                let colorClass = c.type === 'green' ? 'border-emerald-600 bg-emerald-600/20' : (c.type === 'orange' ? 'border-orange-500 bg-orange-500/20' : 'border-red-600 bg-red-600/20');
+                let textClass = c.type === 'green' ? 'text-emerald-400' : (c.type === 'orange' ? 'text-orange-400' : 'text-red-400');
+                grid.innerHTML += `
+                    <div id="charge_${c.id}" onclick="toggleCharge(${c.id})" class="tag-card border ${colorClass} rounded-lg p-3 text-center cursor-pointer transition">
+                        <div class="font-bold text-xs ${textClass}">${c.name}</div>
+                        <div class="text-[10px] text-slate-400 mt-1">${c.months} شهر | $${c.fine}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleCharge(id) {
+            if (selectedCharges.has(id)) {
+                selectedCharges.delete(id);
+                document.getElementById(`charge_${id}`).classList.remove('active');
+            } else {
+                selectedCharges.add(id);
+                document.getElementById(`charge_${id}`).classList.add('active');
+            }
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            let totalFine = 0;
+            let totalMonths = 0;
+            let tagsHTML = '';
+
+            selectedCharges.forEach(id => {
+                let c = policeCharges.find(item => item.id === id);
+                if (c) {
+                    totalFine += c.fine;
+                    totalMonths += c.months;
+                    tagsHTML += `<span class="bg-blue-600/30 text-blue-300 border border-blue-500/50 text-[10px] px-2 py-1 rounded font-bold">${c.name}</span> `;
+                }
+            });
+
+            mdtData.totalFine = totalFine;
+            mdtData.totalMonths = totalMonths;
+            mdtData.tagsHTML = tagsHTML;
+
+            document.getElementById('mdtTotalMonths').innerText = totalMonths + ' شهر';
+            document.getElementById('mdtTotalFines').innerText = '$' + totalFine;
+        }
+
+        function openModal(modalId, type = '') {
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            document.getElementById('modalOverlay').classList.add('flex');
+            
+            document.getElementById('violationsModal').classList.add('hidden');
+            document.getElementById('violationsModal').classList.remove('flex');
+            document.getElementById('textModal').classList.add('hidden');
+
+            if (modalId === 'violationsModal') {
+                document.getElementById('violationsModal').classList.remove('hidden');
+                document.getElementById('violationsModal').classList.add('flex');
+            } else if (modalId === 'textModal') {
+                activeModalType = type;
+                document.getElementById('textModal').classList.remove('hidden');
+                document.getElementById('modalTextTitle').innerText = type === 'offender' ? 'تحديد المجرمين' : 'العساكر المشاركين';
+                document.getElementById('modalTextInput').value = type === 'offender' ? (mdtData.offender !== 'لم يحدد' ? mdtData.offender : '') : (mdtData.officers !== 'لم يحدد' ? mdtData.officers : '');
+            }
+        }
+
+        function closeModals() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+            document.getElementById('modalOverlay').classList.remove('flex');
+        }
+
+        function saveTextModal() {
+            let val = document.getElementById('modalTextInput').value.trim();
+            if (activeModalType === 'offender') {
+                mdtData.offender = val || 'لم يحدد';
+            } else if (activeModalType === 'officers') {
+                mdtData.officers = val || 'لم يحدد';
+            }
+            closeModals();
+        }
+
+        function submitFinalExam() {
+            let caseTitle = document.getElementById('mdtCaseTitle').value.trim();
+            let caseType = document.getElementById('mdtCaseType').value;
+            let caseDetails = document.getElementById('mdtCaseDetails').value.trim();
+            let isBargain = document.getElementById('mdtBargain').checked ? 'نعم' : 'لا';
+            let isClosed = document.getElementById('mdtClosed').checked ? 'نعم' : 'لا';
+
+            if (!caseTitle || !caseDetails) {
+                return alert("الرجاء كتابة عنوان القضية والتفاصيل بالكامل قبل إرسال التقرير!");
+            }
+
+            let mdtReportHTML = `
+                <div class="space-y-2 text-xs text-slate-200">
+                    <p><strong>نوع القضية:</strong> ${caseType}</p>
+                    <p><strong>عنوان القضية:</strong> ${caseTitle}</p>
+                    <p><strong>المجرمين:</strong> ${mdtData.offender}</p>
+                    <p><strong>العساكر المشاركين:</strong> ${mdtData.officers}</p>
+                    <p><strong>المخالفات:</strong> ${mdtData.tagsHTML || 'لم تحدد'}</p>
+                    <p><strong>إجمالي السجن:</strong> ${mdtData.totalMonths} شهر | <strong>الغرامات:</strong> $${mdtData.totalFine}</p>
+                    <p><strong>المساومة:</strong> ${isBargain} | <strong>القضية مغلقة:</strong> ${isClosed}</p>
+                    <hr class="border-slate-700 my-2">
+                    <p><strong>التفاصيل:</strong></p>
+                    <p class="bg-[#1e293b] p-3 rounded border border-slate-700 whitespace-pre-line">${caseDetails}</p>
+                </div>
+            `;
+
+            let submissionPayload = {
+                accountUsername: studentAccountUser,
+                fullName: currentExamData.fullName,
+                callSign: currentExamData.callSign,
+                discordUser: currentExamData.discordUser,
+                targetRank: currentExamData.targetRank,
+                certificateType: currentExamData.certificateType,
+                theoryAnswersHTML: currentExamData.theoryAnswersHTML,
+                mdtReportHTML: mdtReportHTML,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            db.ref('lspd_submissions').push(submissionPayload).then(() => {
+                document.getElementById('step3').classList.remove('flex');
+                document.getElementById('step3').classList.add('hidden');
+                document.getElementById('step4').classList.remove('hidden');
+            }).catch(err => {
+                alert("حدث خطأ أثناء إرسال البيانات: " + err.message);
+            });
+        }
+    </script>
+</body>
+</html>
