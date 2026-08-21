@@ -12,45 +12,33 @@
 
     <header class="border-b border-slate-800/50 bg-[#0a0e16] sticky top-0 z-50">
         <div class="max-w-[96rem] mx-auto px-6 py-2.5 flex items-center justify-between">
-            <div class="flex items-center space-x-4 space-x-reverse">
-                <a href="index.html" class="text-slate-400 hover:text-white text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700 flex items-center gap-1.5"><span>🏠</span> الرئيسية</a>
-            </div>
+            <a href="index.html" class="text-slate-400 hover:text-white text-sm font-bold bg-[#0c1019] px-3.5 py-2 rounded-lg border border-slate-700">🏠 الرئيسية</a>
             <div class="text-white font-black text-sm">أكاديمية شرطة لوس سانتوس</div>
         </div>
     </header>
 
     <main class="flex-grow flex flex-col items-center justify-center p-6 w-full max-w-2xl mx-auto">
-        <!-- حالة عدم تسجيل الدخول -->
-        <div id="notLoggedInView" class="hidden bg-[#0c1019] border-2 border-red-500/30 p-8 rounded-3xl shadow-2xl w-full text-center space-y-4">
-            <div class="text-red-400 text-4xl">🔒</div>
+        <div id="notLoggedInView" class="hidden bg-[#0c1019] border-2 border-red-500/30 p-8 rounded-3xl text-center space-y-4">
             <h1 class="text-xl font-black text-white">تسجيل الدخول مطلوب</h1>
-            <p class="text-slate-400 text-sm">يجب عليك تسجيل الدخول بحسابك لمشاهدة نتيجتك.</p>
-            <a href="index.html" class="inline-block bg-amber-400 hover:bg-amber-500 text-slate-950 font-black px-6 py-2.5 rounded-xl text-sm transition mt-4">الذهاب لتسجيل الدخول 🔑</a>
+            <a href="index.html" class="inline-block bg-amber-400 text-slate-950 font-black px-6 py-2.5 rounded-xl text-sm">الذهاب لتسجيل الدخول 🔑</a>
         </div>
 
-        <!-- حالة انتظار تصحيح النتيجة -->
-        <div id="pendingView" class="hidden bg-[#0c1019] border-2 border-amber-500/30 p-8 rounded-3xl shadow-2xl w-full text-center space-y-4">
-            <div class="text-amber-400 text-4xl">⏳</div>
+        <div id="pendingView" class="hidden bg-[#0c1019] border-2 border-amber-500/30 p-8 rounded-3xl text-center space-y-4">
             <h1 class="text-xl font-black text-white">النتيجة قيد التصحيح والتقييم</h1>
-            <p class="text-slate-400 text-sm">تم إرسال إجاباتك بنجاح، وهي الآن قيد المراجعة من قبل لجنة التقييم. يرجى المراجعة لاحقاً.</p>
-            <button onclick="window.location.reload()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition mt-2">تحديث الصفحة 🔄</button>
+            <p class="text-slate-400 text-sm">تم إرسال إجاباتك بنجاح، وهي الآن قيد المراجعة.</p>
         </div>
 
-        <!-- حالة عرض النتيجة -->
-        <div id="resultView" class="hidden bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl shadow-2xl w-full text-center space-y-6">
+        <div id="resultView" class="hidden bg-[#0c1019] border-2 border-slate-800 p-8 rounded-3xl text-center space-y-6 w-full">
             <div id="statusBadge" class="inline-block px-4 py-1.5 rounded-full text-xs font-bold border"></div>
-            
             <h1 class="text-2xl font-black text-white" id="studentName">--</h1>
             <p class="text-slate-400 text-xs" id="examDetails">--</p>
-
             <div class="bg-[#141a27] border border-slate-800 p-6 rounded-2xl space-y-2">
                 <span class="text-xs text-slate-400 font-bold block">النسبة المئوية المحرزة:</span>
                 <div class="text-5xl font-black" id="scoreDisplay">0%</div>
             </div>
-
             <div class="bg-[#141a27] border border-slate-800 p-4 rounded-xl text-right text-xs space-y-2">
                 <p class="text-slate-400"><strong>القرار النهائي:</strong> <span id="finalDecisionText" class="text-white">--</span></p>
-                <p class="text-slate-400" id="notesBox"><strong>ملاحظات المشرف:</strong> <span id="adminNotes" class="text-slate-300">--</span></p>
+                <p class="text-slate-400"><strong>ملاحظات المشرف:</strong> <span id="adminNotes" class="text-slate-300">--</span></p>
             </div>
         </div>
     </main>
@@ -73,17 +61,13 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const studentUser = localStorage.getItem('studentUser');
-
             if (!studentUser) {
                 document.getElementById('notLoggedInView').classList.remove('hidden');
                 return;
             }
 
-            // البحث عن النتيجة الخاصة بهذا الحساب فقط من قاعدة البيانات
             db.ref('lspd_submissions').once('value').then(snapshot => {
                 const submissions = snapshot.val() || {};
-                
-                // جلب آخر طلب خاضه المختبر بحسابه
                 const userSubKey = Object.keys(submissions).reverse().find(key => 
                     submissions[key] && submissions[key].accountUsername === studentUser
                 );
@@ -94,32 +78,28 @@
                 }
 
                 const subData = submissions[userSubKey];
-
-                // إذا لم يقم الأدمن بوضع درجة حتى الآن
-                if (subData.score === undefined && !subData.status) {
+                if (subData.score === undefined && (!subData.status || subData.status === 'قيد المراجعة')) {
                     document.getElementById('pendingView').classList.remove('hidden');
                     return;
                 }
 
-                // عرض النتيجة الخاصة بصاحب الحساب
                 document.getElementById('resultView').classList.remove('hidden');
                 document.getElementById('studentName').innerText = subData.fullName || 'المختبر';
                 document.getElementById('examDetails').innerText = `الرتبة: ${subData.targetRank} | الشهادة: ${subData.certificateType}`;
                 document.getElementById('scoreDisplay').innerText = (subData.score || 0) + '%';
                 document.getElementById('finalDecisionText').innerText = subData.status || 'تم التقييم';
-                document.getElementById('adminNotes').innerText = subData.notes || 'لا يوجد ملاحظات إضافية.';
+                document.getElementById('adminNotes').innerText = subData.notes || 'لا يوجد ملاحظات.';
 
                 const badge = document.getElementById('statusBadge');
-                const scoreDisplay = document.getElementById('scoreDisplay');
-
-                if (subData.status === 'مقبول' || (subData.score >= (subData.passScore || 70))) {
+                if (subData.status === 'مقبول' || subData.score >= 70) {
                     badge.innerText = 'PASSED - ناجح';
                     badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-emerald-500/40 bg-emerald-500/10 text-emerald-400';
-                    scoreDisplay.className = 'text-5xl font-black text-emerald-400';
+                } else if (subData.status === 'فرصة ثانية') {
+                    badge.innerText = 'SECOND CHANCE - فرصة ثانية';
+                    badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-amber-500/40 bg-amber-500/10 text-amber-400';
                 } else {
                     badge.innerText = 'FAILED - لم يتجاوز الاختبار';
                     badge.className = 'inline-block px-4 py-1.5 rounded-full text-xs font-bold border border-red-500/40 bg-red-500/10 text-red-400';
-                    scoreDisplay.className = 'text-5xl font-black text-red-400';
                 }
             });
         });
